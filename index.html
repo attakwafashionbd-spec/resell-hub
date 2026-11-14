@@ -1,0 +1,901 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>রিসেল হাব</title>
+<meta name="theme-color" content="#0E6F5C">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@500;700&family=Hind+Siliguri:wght@400;500;600&display=swap">
+<style>
+/* Layout: sticky name bar with tabs, then a feed of product cards (1 column on phones, grid on wide screens).
+   Commission always sits in its own amber cell so it never blends with price. */
+:root{
+  color-scheme:light;
+  --bg:#F3F6F5;--surface:#FFFFFF;--fg:#14231F;--muted:#5A6B66;--line:#DCE4E1;
+  --accent:#0E6F5C;--accent-ink:#FFFFFF;
+  --comm:#8F5200;--comm-bg:#FFF0D2;
+  --ok:#1B7F3B;--ok-bg:#DFF3E5;--warn:#8A5A00;--warn-bg:#FFF0CF;--bad:#B3261E;--bad-bg:#FBE3E1;--info:#2B5FA8;--info-bg:#E1ECFA;
+  --f-display:'Anek Bangla','Hind Siliguri','Noto Sans Bengali',system-ui,sans-serif;
+  --f-body:'Hind Siliguri','Noto Sans Bengali',system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root{
+  color-scheme:dark;
+  --bg:#0D1412;--surface:#15201D;--fg:#E7F0ED;--muted:#92A49E;--line:#263632;
+  --accent:#3FC3A6;--accent-ink:#06251E;
+  --comm:#F4B64F;--comm-bg:#35280F;
+  --ok:#6FD38C;--ok-bg:#153222;--warn:#F0BC55;--warn-bg:#33270D;--bad:#FF8F86;--bad-bg:#3B1917;--info:#86B4F0;--info-bg:#172A45}}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:var(--f-body);font-size:16px;line-height:1.55;background:var(--bg);color:var(--fg);min-height:100vh;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(48px + env(safe-area-inset-bottom,0px))}
+img{max-width:100%}
+[hidden]{display:none!important}
+.wrap{max-width:1040px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance}
+button,input,textarea,select{font:inherit;color:inherit}
+.muted{color:var(--muted)}
+.sr{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:14px 0;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0}
+.brand h1{font-size:23px;line-height:1.2;font-weight:700}
+.who{display:flex;align-items:center;gap:8px;min-width:0}
+.who .nm{font-size:14px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:30vw}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:99px;font-size:13px;font-weight:600;white-space:nowrap;background:var(--info-bg);color:var(--info)}
+.chip.comm{background:var(--comm-bg);color:var(--comm)}
+button.chip{border:0;cursor:pointer}
+.st-new{background:var(--info-bg);color:var(--info)}
+.st-accepted{background:var(--warn-bg);color:var(--warn)}
+.st-delivered{background:var(--ok-bg);color:var(--ok)}
+.st-cancelled{background:var(--bad-bg);color:var(--bad)}
+.tabs{display:flex;gap:2px;margin-top:8px;overflow-x:auto}
+.tab{appearance:none;border:0;background:none;font-weight:600;font-size:15px;color:var(--muted);padding:10px 14px;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap;display:flex;gap:6px;align-items:center}
+.tab[aria-selected=true]{color:var(--accent);border-bottom-color:var(--accent)}
+.badge{background:var(--accent);color:var(--accent-ink);border-radius:99px;font-size:12px;min-width:20px;padding:0 6px;text-align:center}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+main{padding-top:16px;display:grid;gap:16px;grid-template-columns:minmax(0,1fr)}
+.note{background:var(--warn-bg);color:var(--warn);border-radius:10px;padding:12px 14px;font-size:15px}
+.note.err{background:var(--bad-bg);color:var(--bad)}
+.bar{display:flex;gap:8px;margin-bottom:16px}
+.bar input{flex:1;min-width:0}
+input,textarea,select{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:44px}
+textarea{resize:vertical}
+label{display:block;font-size:14px;font-weight:600;margin:12px 0 4px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{appearance:none;border:1px solid var(--line);background:var(--surface);border-radius:10px;min-height:44px;padding:8px 14px;font-weight:600;font-size:15px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.btn.sm{min-height:36px;padding:4px 12px;font-size:14px}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.link{appearance:none;border:0;background:none;color:var(--accent);font-weight:600;padding:2px 0;cursor:pointer;font-size:14px}
+
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(min(100%,310px),1fr));align-items:start}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;min-width:0}
+.prod.off{opacity:.65}
+.galw{position:relative}
+.gal{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;aspect-ratio:4/3;border-radius:14px 14px 0 0;background:var(--line);scrollbar-width:none}
+.gal::-webkit-scrollbar{display:none}
+.gal img{flex:0 0 100%;width:100%;height:100%;object-fit:cover;scroll-snap-align:center;display:block}
+.gal img.broken{visibility:hidden}
+.noimg{aspect-ratio:4/3;display:grid;place-items:center;background:var(--line);color:var(--muted);border-radius:14px 14px 0 0}
+.cnt{position:absolute;right:10px;bottom:10px;background:rgba(0,0,0,.62);color:#fff;font-size:12px;padding:1px 9px;border-radius:99px}
+.pb{padding:14px;display:grid;gap:10px}
+.ph{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.ph h3{font-size:18px;line-height:1.35;font-weight:700}
+.prices{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.price{font:700 22px var(--f-display)}
+.det{margin:0;white-space:pre-line;font-size:15px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.det.open{display:block;-webkit-line-clamp:unset}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.acts .wide{grid-column:1/-1}
+.empty{grid-column:1/-1;text-align:center;padding:40px 16px;color:var(--muted);border:1px dashed var(--line);border-radius:14px}
+.empty b{display:block;color:var(--fg);font:700 18px var(--f-display);margin-bottom:6px}
+
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+@media(min-width:640px){.stats{grid-template-columns:repeat(4,1fr)}}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
+.stat span{display:block;font-size:13px;color:var(--muted)}
+.stat b{font:700 21px var(--f-display);font-variant-numeric:tabular-nums}
+.stat.hl{background:var(--comm-bg);border-color:transparent}
+.stat.hl span,.stat.hl b{color:var(--comm)}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-block:2px}
+.fchip{appearance:none;border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:6px 14px;font-weight:600;font-size:14px;white-space:nowrap;cursor:pointer;color:var(--muted)}
+.fchip[aria-pressed=true]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.olist{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));align-items:start}
+.order{padding:14px;display:grid;gap:10px}
+.oh{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.oh b{font-family:var(--f-display)}
+.cust{font-size:15px;background:var(--bg);border-radius:10px;padding:10px 12px;display:grid;gap:2px;overflow-wrap:anywhere}
+.tw{overflow-x:auto}
+.lines{width:100%;border-collapse:collapse;font-size:14px}
+.lines th{font-weight:600;color:var(--muted);text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.lines td{padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
+.lines .n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.lines .c{background:var(--comm-bg);color:var(--comm);font-weight:600}
+.lines tfoot td{font-weight:700;border-bottom:0}
+.oa{display:flex;flex-wrap:wrap;gap:8px}
+.small{font-size:13px;color:var(--muted)}
+.rc{padding:14px;display:grid;gap:10px}
+.rc h3{font-size:18px}
+.wdq{display:grid;gap:8px;background:var(--bg);border-radius:10px;padding:10px 12px}
+.wdq .oh{flex-wrap:wrap}
+
+.ov{position:fixed;inset:0;z-index:30;background:rgba(10,20,17,.55);display:flex;align-items:flex-end;justify-content:center;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+.sheet{background:var(--surface);color:var(--fg);width:100%;max-width:560px;max-height:92%;display:flex;flex-direction:column;border-radius:16px 16px 0 0}
+.sh-h{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:14px 16px 4px}
+.sh-h h2{font-size:20px}
+.x{appearance:none;border:0;background:none;font-size:28px;line-height:1;min-width:44px;min-height:44px;cursor:pointer;color:var(--muted)}
+.sh-b{overflow:auto;padding:4px 16px calc(20px + env(safe-area-inset-bottom,0px))}
+@media(min-width:640px){.ov{align-items:center}.sheet{border-radius:16px;max-height:88%}}
+.thumbs{display:flex;flex-wrap:wrap;gap:8px}
+.th{position:relative;width:76px;height:76px;border-radius:10px;overflow:hidden;background:var(--line)}
+.th img{width:100%;height:100%;object-fit:cover;display:block}
+.th button{position:absolute;top:2px;right:2px;width:26px;height:26px;border-radius:99px;border:0;background:rgba(0,0,0,.65);color:#fff;cursor:pointer;font-size:16px;line-height:1}
+.filebtn{display:inline-flex;margin-top:8px;border:1px dashed var(--accent);color:var(--accent);border-radius:10px;padding:10px 14px;font-weight:600;cursor:pointer}
+.chk{display:flex;gap:10px;align-items:center;margin-top:14px;font-weight:500}
+.chk input{width:22px;min-height:22px;height:22px}
+.fbtns{display:grid;gap:8px;margin-top:18px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(24px + env(safe-area-inset-bottom,0px));z-index:40;background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:15px;max-width:calc(100vw - 32px);text-align:center}
+.ofm{border-top:1px solid var(--line);margin-top:4px;padding-top:12px}
+.ofh{font:700 16px var(--f-display)}
+.ofm label{margin:10px 0 4px}
+.osum{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:14px 0 6px}
+.osum b{font-variant-numeric:tabular-nums}
+.ocod{display:flex;justify-content:space-between;gap:8px;font-weight:700;margin-bottom:10px;font-variant-numeric:tabular-nums}
+.ofm .btn{width:100%}
+
+.boot{display:grid;place-items:center;min-height:60vh;color:var(--muted)}
+.authc{max-width:440px;margin:6vh auto 0;padding:22px 18px}
+.authc h1{font-size:28px;margin-bottom:4px}
+.authc form{display:grid}
+.authc .fbtns{margin-top:16px}
+.authsw{margin-top:14px;display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:space-between}
+.pendc{max-width:480px;margin:10vh auto 0;padding:24px 18px;display:grid;gap:12px;text-align:center}
+.pendc h2{font-size:22px}
+@media (prefers-reduced-motion:no-preference){.gal{scroll-behavior:smooth}}
+</style>
+</head>
+<body>
+<div id="boot" class="boot">লোড হচ্ছে…</div>
+<div id="auth" hidden></div>
+<div id="pending" hidden></div>
+<div id="app" hidden>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand"><h1>রিসেল হাব</h1><div id="who" class="who"></div></div>
+      <nav id="tabs" class="tabs" role="tablist" aria-label="বিভাগ"></nav>
+    </header>
+    <main>
+      <div id="note"></div>
+      <section id="v-products">
+        <div class="bar"><input id="q" type="search" placeholder="পণ্য খুঁজুন" aria-label="পণ্য খুঁজুন"><button id="addp" class="btn pri" data-act="newp" hidden>নতুন পণ্য</button></div>
+        <div id="plist" class="grid"><div class="empty">লোড হচ্ছে…</div></div>
+      </section>
+      <section id="v-orders" hidden>
+        <div id="sum" style="margin-bottom:12px"></div>
+        <div id="ofilter" class="chips" style="margin-bottom:12px"></div>
+        <div id="olist" class="olist"></div>
+      </section>
+      <section id="v-resellers" hidden>
+        <div id="rlist" class="olist"></div>
+      </section>
+      <section id="v-settings" hidden></section>
+    </main>
+  </div>
+</div>
+<div id="toast" class="toast" role="status" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+(function(){
+'use strict';
+const SUPABASE_URL='https://xrcotszpwejhyunqapky.supabase.co';
+const SUPABASE_KEY='sb_publishable_xr5gILUY9RzwXXg8RecMdQ_av9JmBoQ';
+const BUCKET='product-images';
+
+const $=(s,r)=>(r||document).querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const bn=n=>Number(n||0).toLocaleString('bn-BD');
+const tk=n=>'৳'+bn(n);
+const toEn=s=>String(s==null?'':s).replace(/[০-৯]/g,d=>'০১২৩৪৫৬৭৮৯'.indexOf(d));
+const num=v=>{const n=parseFloat(toEn(v).replace(/[^\d.]/g,''));return isFinite(n)?n:0;};
+const qn=v=>Math.max(1,Math.min(999,Math.round(num(v))||1));
+const fmtDate=ts=>{try{return new Date(ts).toLocaleString('bn-BD',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'});}catch(e){return '';}};
+const shortId=id=>'#'+String(id).replace(/-/g,'').slice(-5).toUpperCase();
+const STATUS={new:'নতুন',accepted:'গৃহীত',delivered:'ডেলিভারি হয়েছে',cancelled:'বাতিল'};
+const WDLAB={pending:['অপেক্ষায়','st-new'],paid:['পরিশোধ হয়েছে','st-delivered'],rejected:['বাতিল','st-cancelled']};
+const listOf=v=>{const seen={};return String(v||'').split(/[,،\n]+/).map(s=>s.trim()).filter(s=>s&&!seen[s]&&(seen[s]=1)).slice(0,12);};
+const phoneOk=p=>/^01[3-9]\d{8}$/.test(p);
+const cleanPhone=v=>toEn(v).replace(/[\s\-+]/g,'').replace(/^88/,'');
+const imgUrl=path=>SUPABASE_URL+'/storage/v1/object/public/'+BUCKET+'/'+encodeURIComponent(path);
+
+if(!window.supabase||!window.supabase.createClient){
+  $('#boot').textContent='সার্ভারের সাথে যোগাযোগ করা যাচ্ছে না। ইন্টারনেট দেখে পেজটি আবার খুলুন।';
+  return;
+}
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+const S={session:null,uid:null,isAdmin:false,profile:null,
+  products:[],settings:{},orders:[],payouts:[],withdrawals:[],profiles:[],
+  loaded:false,loadErr:false,view:'boot',authMode:'in',
+  draft:{},openForm:null,tab:'products',filter:'all',q:'',sheet:null,busy:{}};
+
+/* ---------- messages ---------- */
+let toastT;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{t.hidden=true;},3800);}
+function errMsg(e){
+  const m=(e&&e.message)||'';
+  if(/[ঀ-৿]/.test(m))return m;
+  if(/permission denied|row-level security/i.test(m)||(e&&e.code==='42501'))return 'এই কাজের অনুমতি নেই।';
+  if(/failed to fetch|networkerror|load failed/i.test(m))return 'ইন্টারনেট সংযোগ দেখুন।';
+  if(/rate limit|too many/i.test(m))return 'একটু পরে আবার চেষ্টা করুন।';
+  if(/file size|too large|exceeded/i.test(m))return 'ছবির সাইজ অনেক বড়।';
+  return 'সংরক্ষণ হয়নি। আবার চেষ্টা করুন।';
+}
+function authErr(e){
+  const m=(e&&e.message)||'';
+  if(/invalid login credentials/i.test(m))return 'ইমেইল বা পাসওয়ার্ড ঠিক নেই।';
+  if(/already registered|already been registered/i.test(m))return 'এই ইমেইলে আগেই অ্যাকাউন্ট আছে। “ঢুকুন” থেকে ঢুকুন।';
+  if(/not confirmed/i.test(m))return 'ইমেইল এখনও ভেরিফাই হয়নি। ইনবক্স দেখুন।';
+  if(/valid email|invalid.*email|unable to validate email/i.test(m))return 'সঠিক ইমেইল দিন।';
+  if(/password/i.test(m)&&/6|least|short|weak/i.test(m))return 'পাসওয়ার্ড অন্তত ৬ অক্ষরের দিন।';
+  if(/rate limit|too many|security purposes/i.test(m))return 'একটু পরে আবার চেষ্টা করুন।';
+  if(/failed to fetch|networkerror|load failed/i.test(m))return 'ইন্টারনেট সংযোগ দেখুন।';
+  return 'কিছু একটা সমস্যা হয়েছে। আবার চেষ্টা করুন।';
+}
+
+/* ---------- views ---------- */
+function showView(v){
+  S.view=v;
+  $('#boot').hidden=v!=='boot';
+  $('#auth').hidden=!(v==='auth'||v==='recovery');
+  $('#pending').hidden=v!=='pending';
+  $('#app').hidden=v!=='app';
+  if(v==='auth'||v==='recovery')renderAuth();
+  if(v==='pending')renderPending();
+  if(v==='app')render();
+}
+function renderAuth(){
+  const m=S.view==='recovery'?'recovery':S.authMode,box=$('#auth');
+  let body='';
+  if(m==='in')body='<label for="a-email">ইমেইল</label><input id="a-email" type="email" autocomplete="email" inputmode="email">'+
+    '<label for="a-pass">পাসওয়ার্ড</label><input id="a-pass" type="password" autocomplete="current-password">'+
+    '<div class="fbtns"><button class="btn pri" type="submit" id="a-go">ঢুকুন</button></div>'+
+    '<div class="authsw"><button type="button" class="link" data-act="authmode" data-m="up">নতুন রিসেলার? অ্যাকাউন্ট খুলুন</button><button type="button" class="link" data-act="authmode" data-m="forgot">পাসওয়ার্ড ভুলে গেছেন?</button></div>';
+  if(m==='up')body='<label for="a-name">আপনার নাম</label><input id="a-name" autocomplete="name">'+
+    '<label for="a-phone">মোবাইল নম্বর</label><input id="a-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="০১৭XXXXXXXX">'+
+    '<label for="a-pay">কমিশন পাওয়ার নম্বর (বিকাশ/নগদ, পরে দিলেও চলবে)</label><input id="a-pay" type="tel" inputmode="tel" placeholder="০১৭XXXXXXXX">'+
+    '<label for="a-email">ইমেইল</label><input id="a-email" type="email" autocomplete="email" inputmode="email">'+
+    '<label for="a-pass">পাসওয়ার্ড (অন্তত ৬ অক্ষর)</label><input id="a-pass" type="password" autocomplete="new-password">'+
+    '<div class="fbtns"><button class="btn pri" type="submit" id="a-go">অ্যাকাউন্ট খুলুন</button></div>'+
+    '<p class="small" style="margin:10px 0 0">অ্যাকাউন্ট খোলার পর অ্যাডমিন অনুমোদন দিলে আপনি পণ্য দেখতে পাবেন।</p>'+
+    '<div class="authsw"><button type="button" class="link" data-act="authmode" data-m="in">আগে থেকেই অ্যাকাউন্ট আছে? ঢুকুন</button></div>';
+  if(m==='forgot')body='<label for="a-email">আপনার ইমেইল</label><input id="a-email" type="email" autocomplete="email" inputmode="email">'+
+    '<div class="fbtns"><button class="btn pri" type="submit" id="a-go">পাসওয়ার্ড বদলের লিংক পাঠান</button></div>'+
+    '<div class="authsw"><button type="button" class="link" data-act="authmode" data-m="in">ফিরে যান</button></div>';
+  if(m==='recovery')body='<label for="a-pass">নতুন পাসওয়ার্ড (অন্তত ৬ অক্ষর)</label><input id="a-pass" type="password" autocomplete="new-password">'+
+    '<div class="fbtns"><button class="btn pri" type="submit" id="a-go">পাসওয়ার্ড সেভ করুন</button></div>';
+  const title={in:'ঢুকুন',up:'নতুন অ্যাকাউন্ট',forgot:'পাসওয়ার্ড ভুলে গেছেন',recovery:'নতুন পাসওয়ার্ড দিন'}[m];
+  box.innerHTML='<div class="card authc"><h1>রিসেল হাব</h1><p class="muted" style="margin:0 0 10px">'+title+'</p><form id="af" data-m="'+m+'" novalidate>'+body+'</form></div>';
+}
+function renderPending(){
+  const p=S.profile;
+  $('#pending').innerHTML='<div class="card pendc"><h2>অনুমোদনের অপেক্ষায়</h2>'+
+    '<p class="muted" style="margin:0">'+(p?esc(p.name||'আপনার')+'-এর অ্যাকাউন্ট খোলা হয়েছে। অ্যাডমিন অনুমোদন দিলে আপনি পণ্য ও কমিশন দেখতে পারবেন।':'আপনার প্রোফাইল পাওয়া যায়নি। অ্যাডমিনকে জানান।')+'</p>'+
+    '<div class="fbtns" style="margin:0"><button class="btn pri" data-act="recheck">অনুমোদন হয়েছে কিনা দেখুন</button><button class="btn" data-act="signout">বের হন</button></div></div>';
+}
+
+/* ---------- auth ---------- */
+document.addEventListener('submit',async e=>{
+  const f=e.target;
+  if(f&&f.id==='af'){e.preventDefault();handleAuth(f);return;}
+  if(f&&f.matches&&f.matches('form.ofm')){e.preventDefault();submitOrder(f);}
+});
+async function handleAuth(f){
+  const m=f.dataset.m,btn=$('#a-go'),val=id=>{const el=$(id);return el?el.value.trim():'';};
+  const email=val('#a-email').toLowerCase(),pass=$('#a-pass')?$('#a-pass').value:'';
+  if(m!=='recovery'&&!/^\S+@\S+\.\S+$/.test(email))return toast('সঠিক ইমেইল দিন।');
+  if(m!=='forgot'&&pass.length<6)return toast('পাসওয়ার্ড অন্তত ৬ অক্ষরের দিন।');
+  let name='',phone='',payout='';
+  if(m==='up'){
+    name=val('#a-name');phone=cleanPhone(val('#a-phone'));payout=val('#a-pay');
+    if(!name)return toast('আপনার নাম দিন।');
+    if(!phoneOk(phone))return toast('সঠিক ১১ সংখ্যার মোবাইল নম্বর দিন।');
+  }
+  btn.disabled=true;
+  try{
+    if(m==='in'){
+      const r=await sb.auth.signInWithPassword({email,password:pass});
+      if(r.error)throw r.error;
+      await startSession(r.data.session);
+    }else if(m==='up'){
+      const r=await sb.auth.signUp({email,password:pass,options:{data:{name,phone,payout},emailRedirectTo:location.origin+location.pathname}});
+      if(r.error)throw r.error;
+      if(r.data.session)await startSession(r.data.session);
+      else{S.authMode='in';renderAuth();toast('ইমেইলে একটা লিংক গেছে। লিংকে চেপে ভেরিফাই করে তারপর ঢুকুন।');return;}
+    }else if(m==='forgot'){
+      const r=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});
+      if(r.error)throw r.error;
+      S.authMode='in';renderAuth();toast('ইমেইলে পাসওয়ার্ড বদলের লিংক পাঠানো হয়েছে।');return;
+    }else if(m==='recovery'){
+      const r=await sb.auth.updateUser({password:pass});
+      if(r.error)throw r.error;
+      toast('নতুন পাসওয়ার্ড সেভ হয়েছে।');
+      const s=await sb.auth.getSession();
+      S.uid=null;await startSession(s.data.session);
+    }
+  }catch(x){const b=$('#a-go');if(b)b.disabled=false;toast(authErr(x));}
+}
+
+let starting=false;
+async function startSession(session){
+  if(!session){showView('auth');return;}
+  if(starting)return;
+  if(S.uid===session.user.id&&(S.view==='app'||S.view==='pending'))return;
+  starting=true;
+  try{
+    S.session=session;S.uid=session.user.id;
+    const r=await Promise.all([sb.rpc('is_admin'),sb.from('profiles').select('*').eq('id',S.uid).maybeSingle()]);
+    S.isAdmin=r[0].data===true;S.profile=r[1].data||null;
+    if(!S.isAdmin&&!(S.profile&&S.profile.approved)){showView('pending');return;}
+    S.tab='products';S.loaded=false;
+    await loadAll();
+    subscribeRealtime();
+    showView('app');
+  }catch(x){S.uid=null;showView('auth');toast(errMsg(x));}
+  finally{starting=false;}
+}
+async function recheck(){
+  const s=await sb.auth.getSession();
+  if(!s.data.session)return showView('auth');
+  S.uid=null;S.view='boot';
+  await startSession(s.data.session);
+  if(S.view==='pending')toast('এখনও অনুমোদন হয়নি।');
+}
+async function signOut(){
+  try{await sb.auth.signOut();}catch(e){}
+  resetState();showView('auth');
+}
+function resetState(){
+  if(S.channel){try{sb.removeChannel(S.channel);}catch(e){}S.channel=null;}
+  Object.assign(S,{session:null,uid:null,isAdmin:false,profile:null,products:[],settings:{},orders:[],payouts:[],withdrawals:[],profiles:[],loaded:false,loadErr:false,draft:{},openForm:null,authMode:'in'});
+  closeSheet();
+}
+sb.auth.onAuthStateChange((evt,session)=>{
+  if(evt==='PASSWORD_RECOVERY'){showView('recovery');return;}
+  if(evt==='SIGNED_OUT'){resetState();showView('auth');return;}
+  if(evt==='SIGNED_IN'&&session&&S.view!=='recovery')setTimeout(()=>startSession(session),0);
+});
+setInterval(()=>{if(S.view==='pending')recheckQuiet();},30000);
+async function recheckQuiet(){
+  try{const s=await sb.auth.getSession();if(!s.data.session)return;
+    const p=await sb.from('profiles').select('approved').eq('id',s.data.session.user.id).maybeSingle();
+    if(p.data&&p.data.approved){S.uid=null;S.view='boot';await startSession(s.data.session);}}catch(e){}
+}
+
+/* ---------- data ---------- */
+const normProduct=p=>({id:p.id,name:p.name,price:num(p.price),commission:num(p.commission),stock:p.stock==null?null:Number(p.stock),sizes:p.sizes||[],colors:p.colors||[],details:p.details||'',images:p.images||[],active:p.active!==false,createdAt:Date.parse(p.created_at)||0});
+const normOrder=o=>({id:o.id,owner:o.reseller_id,zone:o.zone,customer:{name:o.customer_name,phone:o.customer_phone,address:o.customer_address},note:o.note||'',status:o.status,delivery:num(o.delivery),createdAt:Date.parse(o.created_at)||0,
+  items:(o.order_items||[]).map(i=>({pid:i.product_id,name:i.name,qty:Number(i.qty),size:i.size||'',color:i.color||'',price:num(i.price),commission:num(i.commission)}))});
+const normPayout=p=>({id:p.id,resellerId:p.reseller_id,amount:num(p.amount),note:p.note||'',requestId:p.request_id,at:Date.parse(p.created_at)||0});
+const normWd=w=>({id:w.id,uid:w.reseller_id,amount:num(w.amount),payout:w.payout||'',status:w.status,at:Date.parse(w.created_at)||0});
+async function loadAll(){
+  const r=await Promise.all([
+    sb.from('products').select('*').order('created_at',{ascending:false}),
+    sb.from('settings').select('*').eq('id',1).maybeSingle(),
+    sb.from('orders').select('*, order_items(*)').order('created_at',{ascending:false}).limit(1000),
+    sb.from('payouts').select('*').order('created_at',{ascending:false}).limit(2000),
+    sb.from('withdrawals').select('*').order('created_at',{ascending:false}).limit(2000),
+    S.isAdmin?sb.from('profiles').select('*').order('created_at',{ascending:false}):sb.from('profiles').select('*').eq('id',S.uid).maybeSingle()
+  ]);
+  S.loadErr=r.some(x=>x.error);
+  if(r[0].data)S.products=r[0].data.map(normProduct);
+  if(r[1].data)S.settings=r[1].data;
+  if(r[2].data)S.orders=r[2].data.map(normOrder);
+  if(r[3].data)S.payouts=r[3].data.map(normPayout);
+  if(r[4].data)S.withdrawals=r[4].data.map(normWd);
+  if(S.isAdmin){if(r[5].data)S.profiles=r[5].data;}
+  else if(r[5].data){S.profile=r[5].data;S.profiles=[r[5].data];}
+  S.loaded=true;
+}
+let reloadT;
+function scheduleReload(){
+  clearTimeout(reloadT);
+  reloadT=setTimeout(async()=>{if(S.view!=='app')return;try{await loadAll();render();}catch(e){}},600);
+}
+function subscribeRealtime(){
+  if(S.channel)return;
+  try{S.channel=sb.channel('live').on('postgres_changes',{event:'*',schema:'public'},scheduleReload).subscribe();}catch(e){}
+}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&S.view==='app')scheduleReload();});
+
+/* ---------- helpers ---------- */
+const productOf=id=>S.products.find(p=>p.id===id);
+const statusOf=o=>o.status||'new';
+const ordersOf=uid=>S.orders.filter(o=>o.owner===uid);
+const myOrders=()=>ordersOf(S.uid);
+const payoutsOf=uid=>S.payouts.filter(p=>p.resellerId===uid);
+const linesOf=o=>o.items;
+const deliveryOf=o=>o.delivery;
+const variantText=l=>[l.size?('সাইজ '+l.size):'',l.color?('রং '+l.color):''].filter(Boolean).join(' · ');
+const zoneLabel=z=>z==='out'?'ঢাকার বাইরে':'ঢাকার ভেতরে';
+const zoneCharge=z=>z==='out'?num(S.settings.fee_out):num(S.settings.fee_in);
+function stockInfo(p){
+  if(p.stock==null)return null;
+  const n=num(p.stock);
+  if(n<=0)return{txt:'স্টক শেষ',cls:'st-cancelled',out:true};
+  if(n<=5)return{txt:'মাত্র '+bn(n)+' পিস বাকি',cls:'st-accepted',out:false};
+  return{txt:'স্টকে '+bn(n)+' পিস',cls:'st-delivered',out:false};
+}
+function totals(lines){let total=0,comm=0;lines.forEach(l=>{total+=l.qty*l.price;comm+=l.qty*l.commission;});return{total,comm};}
+function statsFor(orders,payouts){
+  let pending=0,earned=0,sales=0;
+  orders.forEach(o=>{const st=statusOf(o),t=totals(linesOf(o));
+    if(st==='delivered'){earned+=t.comm;sales+=t.total;}else if(st!=='cancelled'){pending+=t.comm;}});
+  const paid=payouts.reduce((a,p)=>a+num(p.amount),0);
+  return{pending,earned,sales,paid,due:earned-paid};
+}
+const resellerName=id=>{const r=S.profiles.find(p=>p.id===id);return (r&&r.name)||'রিসেলার';};
+function wdReqs(uid){return S.withdrawals.filter(w=>w.uid===uid).sort((a,b)=>b.at-a.at);}
+const pendingWd=uid=>wdReqs(uid).filter(r=>r.status==='pending').reduce((a,r)=>a+r.amount,0);
+const availWd=uid=>Math.max(0,statsFor(ordersOf(uid),payoutsOf(uid)).due-pendingWd(uid));
+async function act(key,fn){
+  if(S.busy[key])return;
+  S.busy[key]=true;
+  try{await fn();}catch(x){toast(errMsg(x));}
+  finally{delete S.busy[key];}
+}
+async function callRpc(name,args,okMsg,key){
+  await act(key||name,async()=>{
+    const r=await sb.rpc(name,args);
+    if(r.error)throw r.error;
+    await loadAll();render();
+    if(okMsg)toast(okMsg);
+  });
+}
+
+/* ---------- sheets & small utilities ---------- */
+function openSheet(title,html,opt){
+  closeSheet();
+  const locked=opt&&opt.locked;
+  const el=document.createElement('div');el.className='ov';
+  el.innerHTML='<div class="sheet" role="dialog" aria-modal="true" aria-label="'+esc(title)+'"><div class="sh-h"><h2>'+esc(title)+'</h2>'+(locked?'':'<button class="x" data-act="close" aria-label="বন্ধ করুন">×</button>')+'</div><div class="sh-b">'+html+'</div></div>';
+  if(!locked)el.addEventListener('click',e=>{if(e.target===el){closeSheet();render();}});
+  el.dataset.locked=locked?'1':'';
+  document.body.appendChild(el);S.sheet=el;
+  return $('.sh-b',el);
+}
+function closeSheet(){if(S.sheet){S.sheet.remove();S.sheet=null;}}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&S.sheet&&!S.sheet.dataset.locked){closeSheet();render();}});
+async function copyText(text){
+  try{await navigator.clipboard.writeText(text);toast('কপি হয়েছে');}
+  catch(e){openSheet('কপি করুন','<p class="muted">লেখাটি সিলেক্ট করে কপি করুন।</p><textarea id="cp" rows="10" readonly>'+esc(text)+'</textarea>');const ta=$('#cp');if(ta){ta.focus();ta.select();}}
+}
+async function shrink(file){
+  try{const bmp=await createImageBitmap(file);const k=Math.min(1,1600/Math.max(bmp.width,bmp.height));
+    if(k===1&&file.size<1500000&&/jpeg|png|webp/.test(file.type))return file;
+    const c=document.createElement('canvas');c.width=Math.round(bmp.width*k);c.height=Math.round(bmp.height*k);
+    c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
+    const b=await new Promise(r=>c.toBlob(r,'image/jpeg',0.86));return b||file;}
+  catch(e){return file;}
+}
+
+/* ---------- rendering ---------- */
+function render(){
+  if(S.view!=='app')return;
+  renderWho();renderTabs();renderNote();
+  $('#v-products').hidden=S.tab!=='products';
+  $('#v-orders').hidden=S.tab!=='orders';
+  $('#v-resellers').hidden=S.tab!=='resellers';
+  $('#v-settings').hidden=S.tab!=='settings';
+  $('#addp').hidden=!S.isAdmin;
+  if(S.tab==='products')renderProducts();
+  if(S.tab==='orders')renderOrders();
+  if(S.tab==='resellers')renderResellers();
+  if(S.tab==='settings')renderSettings();
+}
+function renderWho(){
+  const nm=(S.profile&&S.profile.name)||'';
+  $('#who').innerHTML=(nm?'<span class="nm">'+esc(nm)+'</span>':'')+(S.isAdmin?'<span class="chip">অ্যাডমিন</span>':'<button class="chip" data-act="profile">প্রোফাইল</button>')+'<button class="chip" data-act="signout" style="background:var(--line);color:var(--fg)">বের হন</button>';
+}
+function renderTabs(){
+  const t=[['products','পণ্য']];
+  if(S.isAdmin){
+    const n=S.orders.filter(o=>statusOf(o)==='new').length;
+    const w=S.withdrawals.filter(x=>x.status==='pending').length+S.profiles.filter(p=>p.id!==S.uid&&!p.approved).length;
+    t.push(['orders','অর্ডার',n],['resellers','রিসেলার',w],['settings','সেটিংস']);
+  }else t.push(['orders','আমার অর্ডার']);
+  $('#tabs').innerHTML=t.map(x=>'<button class="tab" role="tab" data-act="tab" data-tab="'+x[0]+'" aria-selected="'+(S.tab===x[0])+'">'+x[1]+(x[2]?'<span class="badge">'+bn(x[2])+'</span>':'')+'</button>').join('');
+}
+function renderNote(){
+  let h='';
+  if(S.loadErr)h='<div class="note err">কিছু তথ্য লোড হয়নি। ইন্টারনেট দেখে পেজটি আবার খুলুন।</div>';
+  else if(S.isAdmin&&S.loaded&&!S.settings.configured)h='<div class="note">ডেলিভারি চার্জ এখনও ঠিক করা হয়নি। “সেটিংস” ট্যাব থেকে দিন, না হলে অর্ডারে চার্জ ৳০ দেখাবে।</div>';
+  $('#note').innerHTML=h;
+}
+function draftOf(pid){return S.draft[pid]||(S.draft[pid]={qty:'1',size:'',color:'',zone:'in',name:'',phone:'',addr:'',note:''});}
+function sumFor(p,d){const q=qn(d.qty),t=q*num(p.price),c=q*num(p.commission),dv=zoneCharge(d.zone==='out'?'out':'in');return{q,t,c,dv,cod:t+dv};}
+function selHtml(id,f,label,opts,val,ph){
+  return '<label for="'+id+'">'+label+'</label><select id="'+id+'" data-f="'+f+'">'+(ph?'<option value="">বেছে নিন</option>':'')+
+    opts.map(o=>'<option value="'+esc(o[0])+'"'+(o[0]===val?' selected':'')+'>'+esc(o[1])+'</option>').join('')+'</select>';
+}
+function orderForm(p){
+  const d=draftOf(p.id),m=sumFor(p,d),id=esc(p.id),si=stockInfo(p);
+  return '<form class="ofm" data-pid="'+id+'" novalidate><div class="ofh">অর্ডার কনফার্ম করুন</div>'+
+    (p.sizes.length?selHtml('os-'+id,'size','সাইজ',p.sizes.map(s=>[s,s]),d.size,true):'')+
+    (p.colors.length?selHtml('oc-'+id,'color','রং',p.colors.map(s=>[s,s]),d.color,true):'')+
+    '<label for="oq-'+id+'">কত পিস'+(si&&!si.out?' <span class="small">('+si.txt+')</span>':'')+'</label><input id="oq-'+id+'" data-f="qty" inputmode="numeric" value="'+esc(d.qty)+'">'+
+    '<label for="on-'+id+'">কাস্টমারের নাম</label><input id="on-'+id+'" data-f="name" value="'+esc(d.name)+'">'+
+    '<label for="op-'+id+'">কাস্টমারের ফোন</label><input id="op-'+id+'" data-f="phone" inputmode="tel" placeholder="০১৭XXXXXXXX" value="'+esc(d.phone)+'">'+
+    selHtml('oz-'+id,'zone','ডেলিভারি এলাকা',[['in','ঢাকার ভেতরে ('+tk(zoneCharge('in'))+')'],['out','ঢাকার বাইরে ('+tk(zoneCharge('out'))+')']],d.zone==='out'?'out':'in',false)+
+    '<label for="oa-'+id+'">ঠিকানা</label><textarea id="oa-'+id+'" data-f="addr" rows="3" placeholder="গ্রাম/এলাকা, থানা, জেলা">'+esc(d.addr)+'</textarea>'+
+    '<label for="ot-'+id+'">নোট (ঐচ্ছিক)</label><input id="ot-'+id+'" data-f="note" value="'+esc(d.note)+'">'+
+    '<div class="osum"><span>বিক্রয় <b data-o="t">'+tk(m.t)+'</b></span><span>ডেলিভারি <b data-o="d">'+tk(m.dv)+'</b></span><span class="chip comm">আপনার কমিশন <b data-o="c">'+tk(m.c)+'</b></span></div>'+
+    '<div class="ocod"><span>কাস্টমারের কাছ থেকে নেবেন</span><span data-o="g">'+tk(m.cod)+'</span></div>'+
+    '<button class="btn pri" type="submit">অর্ডার কনফার্ম করুন</button></form>';
+}
+function productCard(p){
+  const imgs=p.images,long=(p.details||'').length>110||(p.details||'').split('\n').length>3,si=stockInfo(p);
+  const gal=imgs.length?'<div class="gal">'+imgs.map(i=>'<img src="'+esc(imgUrl(i))+'" alt="'+esc(p.name)+'" loading="lazy" draggable="false">').join('')+'</div>'+(imgs.length>1?'<span class="cnt">১/'+bn(imgs.length)+'</span>':''):'<div class="noimg">ছবি নেই</div>';
+  const main=S.isAdmin?'<button class="btn" data-act="edit">সম্পাদনা</button>'
+    :(si&&si.out?'<button class="btn wide" disabled>স্টক শেষ</button>':'<button class="btn pri wide" data-act="orderform">'+(S.openForm===p.id?'অর্ডার ফর্ম বন্ধ করুন':'অর্ডার করুন')+'</button>');
+  const sz=p.sizes.join(', '),cl=p.colors.join(', ');
+  return '<article class="card prod'+(p.active?'':' off')+'" data-pid="'+esc(p.id)+'"><div class="galw">'+gal+'</div><div class="pb">'+
+    '<div class="ph"><h3>'+esc(p.name)+'</h3>'+(p.active?'':'<span class="chip st-cancelled">বন্ধ</span>')+'</div>'+
+    '<div class="prices"><span class="price">'+tk(p.price)+'</span><span class="chip comm">কমিশন '+tk(p.commission)+' / পিস</span>'+(si?'<span class="chip '+si.cls+'">'+si.txt+'</span>':'')+'</div>'+
+    (sz||cl?'<div class="small">'+(sz?'সাইজ: '+esc(sz):'')+(sz&&cl?' · ':'')+(cl?'রং: '+esc(cl):'')+'</div>':'')+
+    (p.details?'<p class="det">'+esc(p.details)+'</p>':'')+(long?'<button class="link" data-act="more" style="justify-self:start">পুরো বিবরণ</button>':'')+
+    '<div class="acts">'+(S.isAdmin?main:'')+'<button class="btn" data-act="dl"'+(imgs.length?'':' disabled')+'>ছবি ডাউনলোড</button><button class="btn" data-act="copy">বিবরণ কপি</button>'+(S.isAdmin?'':main)+'</div>'+(!S.isAdmin&&S.openForm===p.id&&!(si&&si.out)?orderForm(p):'')+'</div></article>';
+}
+function renderProducts(){
+  const L=$('#plist');
+  const ae=document.activeElement;if(ae&&L.contains(ae)&&ae.closest('form.ofm'))return;
+  if(!S.loaded){L.innerHTML='<div class="empty">লোড হচ্ছে…</div>';return;}
+  const q=S.q.trim().toLowerCase();
+  const ps=S.products.filter(p=>(S.isAdmin||p.active)&&(!q||((p.name||'')+' '+(p.details||'')).toLowerCase().includes(q)));
+  if(!ps.length){
+    L.innerHTML=q?'<div class="empty"><b>কিছু পাওয়া যায়নি</b>অন্য নাম দিয়ে খুঁজুন।</div>'
+      :S.isAdmin?'<div class="empty"><b>এখনও কোনো পণ্য নেই</b>“নতুন পণ্য” চেপে ছবি, দাম, কমিশন ও স্টক দিয়ে প্রথম পণ্যটি যোগ করুন।</div>'
+      :'<div class="empty"><b>এখনও কোনো পণ্য নেই</b>অ্যাডমিন পণ্য যোগ করলে এখানে দেখা যাবে।</div>';
+    return;
+  }
+  L.innerHTML=ps.map(productCard).join('');
+}
+function linesTable(o,showHint){
+  const ls=linesOf(o),t=totals(ls),dv=deliveryOf(o);
+  return '<div class="tw"><table class="lines"><thead><tr><th>পণ্য</th><th class="n">পিস</th><th class="n">বিক্রয়</th><th class="n c">কমিশন</th></tr></thead><tbody>'+
+    ls.map(l=>{const v=variantText(l);return '<tr><td>'+esc(l.name)+(v?'<div class="small">'+esc(v)+'</div>':'')+'<div class="small">'+tk(l.price)+' × '+bn(l.qty)+'</div></td><td class="n">'+bn(l.qty)+'</td><td class="n">'+tk(l.qty*l.price)+'</td><td class="n c">'+tk(l.qty*l.commission)+'</td></tr>';}).join('')+
+    '</tbody><tfoot><tr><td>মোট</td><td></td><td class="n">'+tk(t.total)+'</td><td class="n c">'+tk(t.comm)+'</td></tr>'+
+    '<tr><td colspan="2"><span class="small">ডেলিভারি ('+zoneLabel(o.zone)+')</span></td><td class="n">'+tk(dv)+'</td><td></td></tr>'+
+    '<tr><td colspan="2">কাস্টমারের কাছ থেকে নেবেন</td><td class="n">'+tk(t.total+dv)+'</td><td></td></tr>'+
+    '</tfoot></table></div>';
+}
+function orderCard(o,admin){
+  const st=statusOf(o),c=o.customer||{};
+  let h='<article class="card order" data-oid="'+esc(o.id)+'"><div class="oh"><span><b>'+shortId(o.id)+'</b> <span class="small">'+fmtDate(o.createdAt)+'</span></span><span class="chip st-'+st+'">'+STATUS[st]+'</span></div>';
+  if(admin){const r=S.profiles.find(p=>p.id===o.owner);h+='<div class="small">রিসেলার: '+esc(resellerName(o.owner))+(r&&r.phone?' · '+esc(r.phone):'')+'</div>';}
+  h+='<div class="cust"><b>'+esc(c.name)+'</b><span>'+esc(c.phone)+'</span>'+(admin?'<span>'+esc(c.address)+'</span>':'')+(o.note?'<span class="small">নোট: '+esc(o.note)+'</span>':'')+'</div>';
+  h+=linesTable(o,!admin);
+  if(admin){
+    h+='<div class="oa">';
+    if(st==='new')h+='<button class="btn pri sm" data-act="st" data-to="accepted">গ্রহণ করুন</button><button class="btn danger sm" data-act="st" data-to="cancelled">বাতিল</button>';
+    if(st==='accepted')h+='<button class="btn pri sm" data-act="st" data-to="delivered">ডেলিভারি হয়েছে</button><button class="btn danger sm" data-act="st" data-to="cancelled">বাতিল</button>';
+    if(st==='delivered')h+='<button class="btn sm" data-act="st" data-to="accepted">ডেলিভারি ফিরিয়ে নিন</button>';
+    if(st==='cancelled')h+='<button class="btn sm" data-act="st" data-to="accepted">আবার গ্রহণ করুন</button>';
+    h+='<button class="btn sm" data-act="copyorder">অর্ডার কপি</button></div>';
+  }
+  return h+'</article>';
+}
+function statCards(s){
+  return '<div class="stats"><div class="stat"><span>পেন্ডিং কমিশন</span><b>'+tk(s.pending)+'</b></div><div class="stat"><span>অর্জিত কমিশন</span><b>'+tk(s.earned)+'</b></div><div class="stat"><span>পরিশোধিত</span><b>'+tk(s.paid)+'</b></div><div class="stat hl"><span>বাকি পাওনা</span><b>'+tk(s.due)+'</b></div></div>';
+}
+function wdBlock(){
+  const reqs=wdReqs(S.uid),avail=availWd(S.uid),min=num(S.settings.min_withdraw);
+  return '<div class="card rc" style="margin-top:12px"><div class="oh"><b>কমিশন উত্তোলন</b><span class="small">এখন তোলা যাবে '+tk(avail)+'</span></div>'+
+    '<div><button class="btn pri sm" data-act="wdnew"'+(avail>0?'':' disabled')+'>কমিশন তুলতে চাই</button>'+(min?' <span class="small">ন্যূনতম '+tk(min)+'</span>':'')+'</div>'+
+    (reqs.length?'<div style="display:grid;gap:6px">'+reqs.slice(0,6).map(r=>'<div class="oh"><span>'+tk(r.amount)+' <span class="small">· '+fmtDate(r.at)+'</span></span><span class="chip '+WDLAB[r.status][1]+'">'+WDLAB[r.status][0]+'</span></div>').join('')+'</div>':'')+'</div>';
+}
+function renderOrders(){
+  const sum=$('#sum'),fl=$('#ofilter'),L=$('#olist');
+  if(!S.loaded){sum.innerHTML='';fl.innerHTML='';L.innerHTML='<div class="empty" style="grid-column:1/-1">লোড হচ্ছে…</div>';return;}
+  if(S.isAdmin){
+    const all=S.orders,cnt={all:all.length,new:0,accepted:0,delivered:0,cancelled:0};
+    all.forEach(o=>{cnt[statusOf(o)]++;});
+    let due=0;S.profiles.forEach(p=>{if(p.id!==S.uid)due+=statsFor(ordersOf(p.id),payoutsOf(p.id)).due;});
+    sum.innerHTML='<div class="stats"><div class="stat"><span>নতুন অর্ডার</span><b>'+bn(cnt.new)+'</b></div><div class="stat"><span>গৃহীত</span><b>'+bn(cnt.accepted)+'</b></div><div class="stat"><span>ডেলিভারি হয়েছে</span><b>'+bn(cnt.delivered)+'</b></div><div class="stat hl"><span>মোট কমিশন বাকি</span><b>'+tk(due)+'</b></div></div>';
+    fl.innerHTML=[['all','সব'],['new','নতুন'],['accepted','গৃহীত'],['delivered','ডেলিভারি হয়েছে'],['cancelled','বাতিল']].map(f=>'<button class="fchip" data-act="filter" data-f="'+f[0]+'" aria-pressed="'+(S.filter===f[0])+'">'+f[1]+' ('+bn(cnt[f[0]])+')</button>').join('');
+    const list=all.filter(o=>S.filter==='all'||statusOf(o)===S.filter);
+    L.innerHTML=list.length?list.map(o=>orderCard(o,true)).join(''):'<div class="empty" style="grid-column:1/-1"><b>কোনো অর্ডার নেই</b>রিসেলাররা অর্ডার কনফার্ম করলে এখানে আসবে।</div>';
+  }else{
+    const os=myOrders(),s=statsFor(os,S.payouts),lp=S.payouts.slice().sort((a,b)=>b.at-a.at)[0];
+    sum.innerHTML=statCards(s)+(lp?'<p class="small" style="margin:8px 0 0">সর্বশেষ পরিশোধ: '+tk(lp.amount)+' · '+fmtDate(lp.at)+'</p>':'')+wdBlock();
+    fl.innerHTML='';
+    L.innerHTML=os.length?os.map(o=>orderCard(o,false)).join(''):'<div class="empty" style="grid-column:1/-1"><b>এখনও কোনো অর্ডার নেই</b>“পণ্য” ট্যাবে কোনো পণ্যের নিচে “অর্ডার করুন” চেপে প্রথম অর্ডার কনফার্ম করুন।</div>';
+  }
+}
+function renderResellers(){
+  const L=$('#rlist');
+  if(!S.loaded){L.innerHTML='<div class="empty" style="grid-column:1/-1">লোড হচ্ছে…</div>';return;}
+  const rs=S.profiles.filter(p=>p.id!==S.uid);
+  if(!rs.length){L.innerHTML='<div class="empty" style="grid-column:1/-1"><b>এখনও কোনো রিসেলার নেই</b>রিসেলাররা সাইটে অ্যাকাউন্ট খুললে এখানে আসবে, আপনি অনুমোদন দিলে তারা কাজ শুরু করবে।</div>';return;}
+  const data=rs.map(p=>({p,s:statsFor(ordersOf(p.id),payoutsOf(p.id)),n:ordersOf(p.id).length,pend:wdReqs(p.id).filter(r=>r.status==='pending')}))
+    .sort((a,b)=>(Number(!!a.p.approved)-Number(!!b.p.approved))||(b.pend.length-a.pend.length)||(b.s.due-a.s.due));
+  L.innerHTML=data.map(d=>{
+    const p=d.p,id=esc(p.id);
+    const head='<div class="oh"><h3>'+esc(p.name||'নাম নেই')+'</h3><span class="chip '+(p.approved?'st-delivered':'st-accepted')+'">'+(p.approved?'অনুমোদিত':'অনুমোদনের অপেক্ষায়')+'</span></div>'+
+      '<div class="small">ফোন: '+esc(p.phone||'—')+' · পেমেন্ট নম্বর: '+esc(p.payout||'—')+(p.approved?' · অর্ডার '+bn(d.n)+'টি':'')+'</div>';
+    if(!p.approved)return '<article class="card rc" data-rid="'+id+'">'+head+'<div><button class="btn pri sm" data-act="approve" data-v="1">অনুমোদন দিন</button></div></article>';
+    const pays=payoutsOf(p.id).sort((a,b)=>b.at-a.at).slice(0,3);
+    return '<article class="card rc" data-rid="'+id+'">'+head+statCards(d.s)+
+      (d.pend.length?'<div class="wdq"><b>উত্তোলনের অনুরোধ</b>'+d.pend.map(q=>'<div class="oh" data-req="'+esc(q.id)+'"><span>'+tk(q.amount)+' <span class="small">· '+esc(q.payout||'নম্বর নেই')+' · '+fmtDate(q.at)+'</span></span><span class="oa"><button class="btn pri sm" data-act="wdpay">পরিশোধ হয়েছে</button><button class="btn danger sm" data-act="wdrej">বাতিল</button></span></div>').join('')+'</div>':'')+
+      (pays.length?'<div class="small">'+pays.map(x=>'পরিশোধ '+tk(x.amount)+' · '+fmtDate(x.at)+(x.note?' · '+esc(x.note):'')).join('<br>')+'</div>':'')+
+      '<div class="oa"><button class="btn sm" data-act="payout"'+(d.s.due>0?'':' disabled')+'>নিজে থেকে পরিশোধ রেকর্ড করুন</button><button class="btn danger sm" data-act="approve" data-v="0">অনুমোদন তুলে নিন</button></div></article>';
+  }).join('');
+}
+function renderSettings(){
+  const box=$('#v-settings');
+  if(!S.isAdmin||!S.loaded){box.innerHTML='';box.dataset.built='';return;}
+  if(box.dataset.built==='1')return;
+  box.dataset.built='1';
+  const s=S.settings||{},v=x=>esc(x==null?'':x);
+  box.innerHTML='<form id="sf" class="card rc" style="max-width:560px" novalidate><h3>ডেলিভারি চার্জ</h3>'+
+    '<div class="row2"><div><label for="sf-in" style="margin-top:0">ঢাকার ভেতরে (৳)</label><input id="sf-in" inputmode="numeric" placeholder="যেমন ৬০" value="'+v(s.fee_in)+'"></div>'+
+    '<div><label for="sf-out" style="margin-top:0">ঢাকার বাইরে (৳)</label><input id="sf-out" inputmode="numeric" placeholder="যেমন ১২০" value="'+v(s.fee_out)+'"></div></div>'+
+    '<h3 style="margin-top:8px">কমিশন উত্তোলন</h3><div><label for="sf-min" style="margin-top:0">ন্যূনতম উত্তোলন (৳)</label><input id="sf-min" inputmode="numeric" placeholder="ফাঁকা বা ০ = কোনো সীমা নেই" value="'+v(s.min_withdraw)+'"></div>'+
+    '<div class="fbtns" style="margin-top:6px"><button class="btn pri" type="submit" id="sf-save">সংরক্ষণ করুন</button></div>'+
+    '<p class="small" style="margin:0">অর্ডার করার মুহূর্তের চার্জ সেই অর্ডারে বসে যায়। পরে চার্জ বদলালে আগের অর্ডারে প্রভাব পড়বে না।</p></form>';
+}
+
+/* ---------- sheets ---------- */
+function productSheet(p){
+  const edit=!!p;let imgs=(p?p.images:[]).slice();const removed=[];let files=[];let urls=[];
+  const body=openSheet(edit?'পণ্য সম্পাদনা':'নতুন পণ্য',
+    '<form id="pf"><label for="pf-name">পণ্যের নাম</label><input id="pf-name" required value="'+esc(p&&p.name)+'">'+
+    '<div class="row2"><div><label for="pf-price">বিক্রয় মূল্য (৳)</label><input id="pf-price" inputmode="numeric" required value="'+(p?esc(p.price):'')+'"></div>'+
+    '<div><label for="pf-comm">কমিশন প্রতি পিস (৳)</label><input id="pf-comm" inputmode="numeric" required value="'+(p?esc(p.commission):'')+'"></div></div>'+
+    '<label for="pf-stock">স্টক (পিস)</label><input id="pf-stock" inputmode="numeric" placeholder="ফাঁকা রাখলে সীমাহীন" value="'+(p&&p.stock!=null?esc(p.stock):'')+'">'+
+    '<div class="row2"><div><label for="pf-sizes">সাইজ (কমা দিয়ে)</label><input id="pf-sizes" placeholder="M, L, XL" value="'+esc(p?p.sizes.join(', '):'')+'"></div>'+
+    '<div><label for="pf-colors">রং (কমা দিয়ে)</label><input id="pf-colors" placeholder="লাল, কালো" value="'+esc(p?p.colors.join(', '):'')+'"></div></div>'+
+    '<label for="pf-det">বিবরণ</label><textarea id="pf-det" rows="6" placeholder="কাপড়/মেটেরিয়াল, মাপ, ডেলিভারি সময়…">'+esc(p&&p.details)+'</textarea>'+
+    '<label>ছবি (সর্বোচ্চ ৬টি)</label><div id="pf-imgs" class="thumbs"></div>'+
+    '<label class="filebtn" for="pf-files">ছবি যোগ করুন</label><input id="pf-files" class="sr" type="file" accept="image/*" multiple>'+
+    '<label class="chk" for="pf-act"><input id="pf-act" type="checkbox"'+(!p||p.active?' checked':'')+'> রিসেলারদের দেখান</label>'+
+    '<div class="fbtns"><button class="btn pri" type="submit" id="pf-save">সংরক্ষণ করুন</button>'+(edit?'<button class="btn danger" type="button" id="pf-del">পণ্য মুছুন</button>':'')+'</div></form>');
+  const T=$('#pf-imgs',body);
+  function thumbs(){
+    urls.forEach(u=>URL.revokeObjectURL(u));urls=files.map(f=>URL.createObjectURL(f));
+    T.innerHTML=imgs.map((path,i)=>'<div class="th"><img src="'+esc(imgUrl(path))+'" alt=""><button type="button" data-ex="'+i+'" aria-label="ছবি সরান">×</button></div>').join('')+
+      urls.map((u,i)=>'<div class="th"><img src="'+u+'" alt=""><button type="button" data-nx="'+i+'" aria-label="ছবি সরান">×</button></div>').join('');
+  }
+  thumbs();
+  T.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+    if(b.dataset.ex!=null){removed.push(imgs.splice(+b.dataset.ex,1)[0]);}
+    if(b.dataset.nx!=null){files.splice(+b.dataset.nx,1);}
+    thumbs();});
+  $('#pf-files',body).addEventListener('change',e=>{
+    const room=6-imgs.length-files.length;const add=Array.from(e.target.files||[]).slice(0,Math.max(0,room));
+    if((e.target.files||[]).length>room)toast('সর্বোচ্চ ৬টি ছবি রাখা যাবে।');
+    files=files.concat(add);e.target.value='';thumbs();});
+  const del=$('#pf-del',body);
+  if(del)del.addEventListener('click',async()=>{
+    if(del.dataset.sure!=='1'){del.dataset.sure='1';del.textContent='নিশ্চিত, মুছে ফেলুন';return;}
+    del.disabled=true;
+    try{
+      const r=await sb.from('products').delete().eq('id',p.id);
+      if(r.error)throw r.error;
+      if(p.images.length){try{await sb.storage.from(BUCKET).remove(p.images);}catch(x){}}
+      closeSheet();await loadAll();render();toast('পণ্য মুছে ফেলা হয়েছে।');
+    }catch(x){del.disabled=false;toast(errMsg(x));}
+  });
+  $('#pf',body).addEventListener('submit',async e=>{
+    e.preventDefault();
+    const name=$('#pf-name').value.trim(),price=num($('#pf-price').value),comm=num($('#pf-comm').value);
+    const sraw=$('#pf-stock').value.trim(),stock=sraw===''?null:Math.max(0,Math.floor(num(sraw)));
+    if(!name)return toast('পণ্যের নাম দিন।');
+    if(!(price>0))return toast('বিক্রয় মূল্য দিন।');
+    if(comm<0||comm>price)return toast('কমিশন বিক্রয় মূল্যের বেশি হতে পারে না।');
+    const btn=$('#pf-save');btn.disabled=true;btn.textContent='সংরক্ষণ হচ্ছে…';
+    const uploaded=[];
+    try{
+      const paths=imgs.slice();
+      for(const f of files){
+        const b=await shrink(f),ext=/png/.test(b.type)?'png':/webp/.test(b.type)?'webp':'jpg';
+        const path=(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random().toString(36).slice(2))+'.'+ext;
+        const r=await sb.storage.from(BUCKET).upload(path,b,{contentType:b.type||'image/jpeg',cacheControl:'31536000'});
+        if(r.error)throw r.error;
+        uploaded.push(path);paths.push(path);
+      }
+      const row={name,price,commission:comm,stock,sizes:listOf($('#pf-sizes').value),colors:listOf($('#pf-colors').value),details:$('#pf-det').value.trim(),images:paths,active:$('#pf-act').checked,updated_at:new Date().toISOString()};
+      const r=edit?await sb.from('products').update(row).eq('id',p.id):await sb.from('products').insert(row);
+      if(r.error)throw r.error;
+      if(removed.length){try{await sb.storage.from(BUCKET).remove(removed);}catch(x){}}
+      closeSheet();await loadAll();render();toast('পণ্য সংরক্ষণ হয়েছে।');
+    }catch(x){
+      if(uploaded.length){try{await sb.storage.from(BUCKET).remove(uploaded);}catch(y){}}
+      btn.disabled=false;btn.textContent='সংরক্ষণ করুন';toast(errMsg(x));
+    }
+  });
+}
+function profileSheet(){
+  const p=S.profile||{};
+  const body=openSheet('আমার প্রোফাইল',
+    '<form id="rf"><label for="rf-name">আপনার নাম</label><input id="rf-name" required value="'+esc(p.name)+'">'+
+    '<label for="rf-phone">ফোন নম্বর</label><input id="rf-phone" inputmode="tel" required value="'+esc(p.phone)+'" placeholder="০১৭XXXXXXXX">'+
+    '<label for="rf-pay">কমিশন পাওয়ার নম্বর (বিকাশ/নগদ)</label><input id="rf-pay" inputmode="tel" value="'+esc(p.payout)+'" placeholder="বিকাশ ০১৭XXXXXXXX">'+
+    '<div class="fbtns"><button class="btn pri" type="submit" id="rf-save">সংরক্ষণ করুন</button></div></form>');
+  $('#rf',body).addEventListener('submit',async e=>{
+    e.preventDefault();
+    const name=$('#rf-name').value.trim(),phone=cleanPhone($('#rf-phone').value);
+    if(!name)return toast('নাম দিন।');
+    if(!phoneOk(phone))return toast('সঠিক ১১ সংখ্যার মোবাইল নম্বর দিন।');
+    const btn=$('#rf-save');btn.disabled=true;
+    try{
+      const r=await sb.from('profiles').update({name,phone,payout:$('#rf-pay').value.trim()}).eq('id',S.uid);
+      if(r.error)throw r.error;
+      await loadAll();closeSheet();render();toast('প্রোফাইল সংরক্ষণ হয়েছে।');
+    }catch(x){btn.disabled=false;toast(errMsg(x));}
+  });
+}
+function payoutSheet(rid){
+  const due=statsFor(ordersOf(rid),payoutsOf(rid)).due;
+  const body=openSheet('পরিশোধ রেকর্ড','<p class="muted" style="margin:4px 0 0">'+esc(resellerName(rid))+' · বাকি '+tk(due)+'</p><form id="pof"><label for="po-amt">পরিশোধের পরিমাণ (৳)</label><input id="po-amt" inputmode="numeric" required value="'+due+'"><label for="po-note">নোট (যেমন বিকাশ TrxID)</label><input id="po-note"><div class="fbtns"><button class="btn pri" type="submit" id="po-save">রেকর্ড করুন</button></div></form>');
+  $('#pof',body).addEventListener('submit',async e=>{
+    e.preventDefault();const amt=num($('#po-amt').value);
+    if(!(amt>0))return toast('পরিমাণ দিন।');
+    if(amt>due)return toast('বাকি পাওনার বেশি লেখা যাবে না।');
+    const btn=$('#po-save');btn.disabled=true;
+    try{
+      const r=await sb.rpc('record_payout',{p_reseller:rid,p_amount:amt,p_note:$('#po-note').value.trim()});
+      if(r.error)throw r.error;
+      await loadAll();closeSheet();render();toast('পরিশোধ রেকর্ড হয়েছে।');
+    }catch(x){btn.disabled=false;toast(errMsg(x));}
+  });
+}
+function wdSheet(){
+  const pay=(S.profile&&S.profile.payout)||'';
+  if(!pay){toast('আগে প্রোফাইলে কমিশন পাওয়ার নম্বর দিন।');profileSheet();return;}
+  const avail=availWd(S.uid),min=num(S.settings.min_withdraw);
+  const body=openSheet('কমিশন তুলতে চাই','<p class="muted" style="margin:4px 0 0">এখন তোলা যাবে '+tk(avail)+(min?' · ন্যূনতম '+tk(min):'')+'</p>'+
+    '<form id="wf"><label for="wf-amt">কত টাকা তুলবেন (৳)</label><input id="wf-amt" inputmode="numeric" value="'+avail+'"><p class="small">টাকা যাবে এই নম্বরে: '+esc(pay)+'</p>'+
+    '<div class="fbtns"><button class="btn pri" type="submit" id="wf-save">অনুরোধ পাঠান</button></div></form>');
+  $('#wf',body).addEventListener('submit',async e=>{
+    e.preventDefault();const amt=num($('#wf-amt').value);
+    if(!(amt>0))return toast('পরিমাণ দিন।');
+    if(amt>avail)return toast('সর্বোচ্চ '+tk(avail)+' তোলা যাবে।');
+    if(min&&amt<min)return toast('ন্যূনতম '+tk(min)+' তুলতে হবে।');
+    const btn=$('#wf-save');btn.disabled=true;
+    try{
+      const r=await sb.rpc('request_withdrawal',{p_amount:amt});
+      if(r.error)throw r.error;
+      await loadAll();closeSheet();render();toast('অনুরোধ পাঠানো হয়েছে।');
+    }catch(x){btn.disabled=false;toast(errMsg(x));}
+  });
+}
+
+/* ---------- actions ---------- */
+function postText(p){
+  const sz=p.sizes.join(', '),cl=p.colors.join(', ');
+  return (p.name+'\n\nদাম: '+tk(p.price)+(sz?'\nসাইজ: '+sz:'')+(cl?'\nরং: '+cl:'')+'\n\n'+(p.details||'').trim()).trim();
+}
+async function downloadImages(p){
+  if(!p.images.length)return;
+  const base=(p.name||'product').replace(/[\\/:*?"<>|]+/g,' ').trim().slice(0,40)||'product';
+  let n=0;
+  for(let i=0;i<p.images.length;i++){
+    try{
+      const r=await fetch(imgUrl(p.images[i]));if(!r.ok)throw new Error('x');
+      const b=await r.blob(),ext=/png/.test(b.type)?'png':/webp/.test(b.type)?'webp':/gif/.test(b.type)?'gif':'jpg';
+      const u=URL.createObjectURL(b),a=document.createElement('a');
+      a.href=u;a.download=base+'-'+(i+1)+'.'+ext;document.body.appendChild(a);a.click();a.remove();
+      setTimeout(()=>URL.revokeObjectURL(u),4000);n++;
+      await new Promise(res=>setTimeout(res,400));
+    }catch(e){toast('ছবি ডাউনলোড করা যায়নি।');return;}
+  }
+  if(n)toast(bn(n)+'টি ছবি ডাউনলোড হচ্ছে।');
+}
+function orderText(o){
+  const c=o.customer||{},ls=linesOf(o),t=totals(ls),dv=deliveryOf(o);
+  return shortId(o.id)+'\n'+(c.name||'')+'\n'+(c.phone||'')+'\n'+(c.address||'')+'\n\n'+
+    ls.map(l=>{const v=variantText(l);return l.name+(v?' ('+v+')':'')+' × '+bn(l.qty)+' = '+tk(l.qty*l.price);}).join('\n')+
+    '\n\nপণ্যের মোট: '+tk(t.total)+'\nডেলিভারি ('+zoneLabel(o.zone)+'): '+tk(dv)+'\nকাস্টমারের কাছ থেকে নেবেন: '+tk(t.total+dv)+(o.note?'\nনোট: '+o.note:'');
+}
+async function submitOrder(f){
+  const pid=f.dataset.pid,p=productOf(pid),d=draftOf(pid);
+  if(!p||!p.active)return toast('এই পণ্যটি এখন পাওয়া যাচ্ছে না।');
+  if(p.sizes.length&&!d.size)return toast('সাইজ বেছে নিন।');
+  if(p.colors.length&&!d.color)return toast('রং বেছে নিন।');
+  const q=qn(d.qty);
+  if(p.stock!=null&&q>p.stock)return toast(p.stock>0?'স্টকে মাত্র '+bn(p.stock)+' পিস আছে।':'স্টক শেষ।');
+  const name=(d.name||'').trim(),addr=(d.addr||'').trim(),phone=cleanPhone(d.phone);
+  if(!name)return toast('কাস্টমারের নাম দিন।');
+  if(!phoneOk(phone))return toast('সঠিক ১১ সংখ্যার মোবাইল নম্বর দিন।');
+  if(!addr)return toast('ঠিকানা দিন।');
+  const btn=f.querySelector('button[type=submit]');btn.disabled=true;btn.textContent='পাঠানো হচ্ছে…';
+  try{
+    const r=await sb.rpc('place_order',{p_product:p.id,p_qty:q,p_size:d.size||'',p_color:d.color||'',p_zone:d.zone==='out'?'out':'in',p_name:name,p_phone:phone,p_address:addr,p_note:(d.note||'').trim()});
+    if(r.error)throw r.error;
+    delete S.draft[pid];S.openForm=null;S.tab='orders';
+    await loadAll();render();toast('অর্ডার কনফার্ম হয়েছে।');
+  }catch(x){btn.disabled=false;btn.textContent='অর্ডার কনফার্ম করুন';toast(errMsg(x));}
+}
+
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-act]');if(!t)return;
+  const a=t.dataset.act,card=t.closest('[data-pid]'),pid=card&&card.dataset.pid,p=pid&&productOf(pid);
+  switch(a){
+    case 'close':closeSheet();render();break;
+    case 'tab':S.tab=t.dataset.tab;render();break;
+    case 'filter':S.filter=t.dataset.f;render();break;
+    case 'authmode':S.authMode=t.dataset.m;renderAuth();break;
+    case 'signout':signOut();break;
+    case 'recheck':recheck();break;
+    case 'more':{const d=t.previousElementSibling;if(d){const o=d.classList.toggle('open');t.textContent=o?'কম দেখুন':'পুরো বিবরণ';}break;}
+    case 'newp':productSheet(null);break;
+    case 'edit':if(p)productSheet(p);break;
+    case 'copy':if(p)copyText(postText(p));break;
+    case 'dl':if(p)downloadImages(p);break;
+    case 'orderform':if(p){S.openForm=S.openForm===p.id?null:p.id;render();if(S.openForm){const f=document.querySelector('form.ofm input[data-f="name"]');if(f){f.scrollIntoView({block:'center'});f.focus();}}}break;
+    case 'profile':profileSheet();break;
+    case 'st':{const c=t.closest('[data-oid]');callRpc('set_order_status',{p_order:c.dataset.oid,p_status:t.dataset.to},'অর্ডার: '+STATUS[t.dataset.to],'st:'+c.dataset.oid);break;}
+    case 'copyorder':{const c=t.closest('[data-oid]');const o=S.orders.find(x=>x.id===c.dataset.oid);if(o)copyText(orderText(o));break;}
+    case 'payout':{const c=t.closest('[data-rid]');if(c)payoutSheet(c.dataset.rid);break;}
+    case 'wdnew':wdSheet();break;
+    case 'wdpay':case 'wdrej':{
+      const r=t.closest('[data-req]');if(!r)break;
+      if(t.dataset.sure!=='1'){t.dataset.sure='1';t.textContent=a==='wdpay'?'নিশ্চিত, টাকা পাঠিয়েছি':'নিশ্চিত, বাতিল';break;}
+      callRpc('resolve_withdrawal',{p_id:r.dataset.req,p_action:a==='wdpay'?'paid':'rejected'},a==='wdpay'?'পরিশোধ রেকর্ড হয়েছে।':'অনুরোধ বাতিল হয়েছে।','wd:'+r.dataset.req);break;}
+    case 'approve':{
+      const c=t.closest('[data-rid]');if(!c)break;
+      const on=t.dataset.v==='1';
+      if(!on&&t.dataset.sure!=='1'){t.dataset.sure='1';t.textContent='নিশ্চিত, তুলে নিন';break;}
+      callRpc('set_approved',{p_uid:c.dataset.rid,p_approved:on},on?'রিসেলার অনুমোদিত হয়েছে।':'অনুমোদন তুলে নেওয়া হয়েছে।','ap:'+c.dataset.rid);break;}
+  }
+});
+$('#q').addEventListener('input',e=>{S.q=e.target.value;renderProducts();});
+document.addEventListener('input',e=>{
+  const f=e.target.closest&&e.target.closest('form.ofm');if(!f)return;
+  const k=e.target.dataset.f;if(!k)return;
+  const pid=f.dataset.pid,d=draftOf(pid);d[k]=e.target.value;
+  if(k==='qty'||k==='zone'){
+    const p=productOf(pid);if(!p)return;
+    const m=sumFor(p,d),set=(n,v)=>{const el=f.querySelector('[data-o="'+n+'"]');if(el)el.textContent=tk(v);};
+    set('t',m.t);set('d',m.dv);set('c',m.c);set('g',m.cod);
+  }
+});
+document.addEventListener('submit',async e=>{
+  const f=e.target;
+  if(f&&f.id==='sf'){
+    e.preventDefault();
+    const btn=$('#sf-save');btn.disabled=true;
+    try{
+      const r=await sb.from('settings').update({fee_in:num($('#sf-in').value),fee_out:num($('#sf-out').value),min_withdraw:num($('#sf-min').value),configured:true}).eq('id',1);
+      if(r.error)throw r.error;
+      await loadAll();render();toast('সেটিংস সংরক্ষণ হয়েছে।');
+    }catch(x){toast(errMsg(x));}
+    btn.disabled=false;
+  }
+});
+document.addEventListener('scroll',e=>{const g=e.target;if(!g||!g.classList||!g.classList.contains('gal'))return;
+  const c=g.parentNode.querySelector('.cnt');if(c)c.textContent=bn(Math.round(g.scrollLeft/g.clientWidth)+1)+'/'+bn(g.children.length);},true);
+document.addEventListener('error',e=>{if(e.target&&e.target.tagName==='IMG')e.target.classList.add('broken');},true);
+
+/* ---------- boot ---------- */
+(async function boot(){
+  try{
+    const r=await sb.auth.getSession();
+    if(r.data&&r.data.session&&S.view!=='recovery')await startSession(r.data.session);
+    else if(S.view!=='recovery')showView('auth');
+  }catch(e){showView('auth');}
+})();
+})();
+</script>
+</body>
+</html>
