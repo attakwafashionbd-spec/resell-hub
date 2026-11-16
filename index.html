@@ -219,6 +219,7 @@ label{display:block;font-size:14px;font-weight:600;margin:12px 0 4px}
 .chead b{font:700 16px var(--f-display)}.chead span{font-size:13px;color:var(--accent);font-weight:600}
 .sh-b .card.prod{border:0;background:none}
 .ver{text-align:center;font-size:11px;color:var(--muted);padding:18px 0 28px}
+.inst{display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:10px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-weight:600;font-size:14px}.inst span{flex:1;min-width:0}.inst .x{border:0;background:none;color:var(--muted);font-size:22px;line-height:1;cursor:pointer;padding:0 4px}.inst[hidden]{display:none}
 </style>
 </head>
 <body>
@@ -235,6 +236,7 @@ label{display:block;font-size:14px;font-weight:600;margin:12px 0 4px}
       <div id="note"></div>
       <section id="v-products">
         <div class="bar"><input id="q" type="search" placeholder="পণ্য খুঁজুন" aria-label="পণ্য খুঁজুন"><button id="addp" class="btn pri" data-act="newp" hidden>নতুন পণ্য</button></div>
+        <div id="inst" class="inst" hidden><span id="inst-t">অ্যাপ হিসেবে ইনস্টল করুন</span><button class="btn pri sm" id="inst-b" type="button">ইনস্টল</button><button class="x" id="inst-x" type="button" aria-label="বন্ধ">×</button></div>
         <div id="cats" class="ctiles" role="group" aria-label="ক্যাটাগরি"></div>
         <div id="plist" class="plist"><div class="empty">লোড হচ্ছে…</div></div>
       </section>
@@ -248,7 +250,7 @@ label{display:block;font-size:14px;font-weight:600;margin:12px 0 4px}
       </section>
       <section id="v-settings" hidden></section>
     </main>
-<p class="ver">রিসেল হাব · সংস্করণ ৪</p>
+<p class="ver">রিসেল হাব · সংস্করণ ৫</p>
   </div>
 </div>
 <div id="toast" class="toast" role="status" hidden></div>
@@ -1059,6 +1061,21 @@ document.addEventListener('error',e=>{if(e.target&&e.target.tagName==='IMG')e.ta
     else if(S.view!=='recovery')showView('auth');
   }catch(e){showView('auth');}
 })();
+})();
+
+/* ---------- ইনস্টল (PWA) ---------- */
+(function(){
+  try{if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}catch(e){}
+  let dp=null;const box=document.getElementById('inst'),b=document.getElementById('inst-b'),x=document.getElementById('inst-x'),t=document.getElementById('inst-t');
+  if(!box)return;
+  const standalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+  let off=false;try{off=localStorage.getItem('inst-off')==='1';}catch(e){}
+  if(standalone||off)return;
+  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;box.hidden=false;});
+  window.addEventListener('appinstalled',()=>{box.hidden=true;});
+  if(/iphone|ipad|ipod/i.test(navigator.userAgent)){t.textContent='ইনস্টল: Safari-র শেয়ার বাটন → Add to Home Screen';b.hidden=true;box.hidden=false;}
+  b.addEventListener('click',async()=>{if(!dp)return;dp.prompt();try{await dp.userChoice;}catch(e){}dp=null;box.hidden=true;});
+  x.addEventListener('click',()=>{box.hidden=true;try{localStorage.setItem('inst-off','1');}catch(e){}});
 })();
 </script>
 </body>
