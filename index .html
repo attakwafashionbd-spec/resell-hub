@@ -187,6 +187,12 @@ label{display:block;font-size:14px;font-weight:600;margin:12px 0 4px}
 .pendc h2{font-size:22px}
 @media (prefers-reduced-motion:no-preference){.gal{scroll-behavior:smooth}}
 .lp{display:flex;gap:10px;align-items:flex-start}.lth{width:56px;height:56px;border-radius:10px;object-fit:cover;flex:none;border:1px solid var(--line,rgba(128,128,128,.25));background:rgba(128,128,128,.12)}
+.tagbox{display:grid;gap:8px;padding:10px;border:1px solid rgba(128,128,128,.35);border-radius:12px;background:rgba(128,128,128,.08)}
+.tgl{display:flex;flex-wrap:wrap;gap:6px}.tgl:empty{display:none}
+.tg{display:inline-flex;align-items:center;gap:6px;padding:6px 6px 6px 12px;border-radius:10px;font-weight:700;background:var(--info-bg);color:var(--info);border:1px solid currentColor}
+.tg button{border:0;background:rgba(128,128,128,.25);color:inherit;width:22px;height:22px;border-radius:50%;cursor:pointer;line-height:1;font-size:15px;padding:0}
+.tgi{display:flex;gap:8px}.tgi input{flex:1;min-width:0}
+.tgp{display:flex;flex-wrap:wrap;gap:6px}.tgp .pre{border:1px dashed currentColor;background:transparent;cursor:pointer}.tgp .pre.on{background:var(--info-bg);border-style:solid}
 </style>
 </head>
 <body>
@@ -750,13 +756,35 @@ function productSheet(p){
     '<div class="row2"><div><label for="pf-price">বিক্রয় মূল্য (৳)</label><input id="pf-price" inputmode="numeric" required value="'+(p?esc(p.price):'')+'"></div>'+
     '<div><label for="pf-comm">কমিশন প্রতি পিস (৳)</label><input id="pf-comm" inputmode="numeric" required value="'+(p?esc(p.commission):'')+'"></div></div>'+
     '<label for="pf-stock">স্টক (পিস)</label><input id="pf-stock" inputmode="numeric" placeholder="ফাঁকা রাখলে সীমাহীন" value="'+(p&&p.stock!=null?esc(p.stock):'')+'">'+
-    '<div class="row2"><div><label for="pf-sizes">সাইজ (কমা দিয়ে)</label><input id="pf-sizes" placeholder="M, L, XL" value="'+esc(p?p.sizes.join(', '):'')+'"></div>'+
-    '<div><label for="pf-colors">রং (কমা দিয়ে)</label><input id="pf-colors" placeholder="লাল, কালো" value="'+esc(p?p.colors.join(', '):'')+'"></div></div>'+
+    '<label>সাইজ <span class="small">(একটা লিখে Enter বা + চাপুন, প্রতিটা আলাদা ঘর হবে)</span></label><div class="tagbox" id="tg-sizes" data-ph="যেমন: M"></div>'+
+    '<label>রং <span class="small">(একটা লিখে Enter বা + চাপুন)</span></label><div class="tagbox" id="tg-colors" data-ph="যেমন: লাল"></div>'+
     '<label for="pf-det">বিবরণ</label><textarea id="pf-det" rows="6" placeholder="কাপড়/মেটেরিয়াল, মাপ, ডেলিভারি সময়…">'+esc(p&&p.details)+'</textarea>'+
     '<label>ছবি (সর্বোচ্চ ৬টি)</label><div id="pf-imgs" class="thumbs"></div>'+
     '<label class="filebtn" for="pf-files">ছবি যোগ করুন</label><input id="pf-files" class="sr" type="file" accept="image/*" multiple>'+
     '<label class="chk" for="pf-act"><input id="pf-act" type="checkbox"'+(!p||p.active?' checked':'')+'> রিসেলারদের দেখান</label>'+
     '<div class="fbtns"><button class="btn pri" type="submit" id="pf-save">সংরক্ষণ করুন</button>'+(edit?'<button class="btn danger" type="button" id="pf-del">পণ্য মুছুন</button>':'')+'</div></form>');
+  const tags={sizes:p?p.sizes.slice():[],colors:p?p.colors.slice():[]};
+  function tagEd(key,presets){
+    const box=$('#tg-'+key,body);
+    function draw(){
+      box.innerHTML='<div class="tgl">'+tags[key].map((t,i)=>'<span class="tg">'+esc(t)+'<button type="button" data-rm="'+i+'" aria-label="সরান">×</button></span>').join('')+'</div>'+
+        '<div class="tgi"><input type="text" placeholder="'+esc(box.dataset.ph)+'" enterkeyhint="done"><button type="button" class="btn sm" data-add="1">+ যোগ</button></div>'+
+        (presets?'<div class="tgp">'+presets.map(x=>'<button type="button" class="chip pre'+(tags[key].includes(x)?' on':'')+'" data-pre="'+esc(x)+'">'+esc(x)+'</button>').join('')+'</div>':'');
+    }
+    function add(v){listOf(v).forEach(x=>{if(!tags[key].includes(x)&&tags[key].length<12)tags[key].push(x);});}
+    function commit(){const i=box.querySelector('.tgi input');if(i&&i.value.trim()){add(i.value);i.value='';}}
+    box._commit=()=>{commit();};
+    box.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'&&(e.key==='Enter'||e.key===',')){e.preventDefault();commit();draw();box.querySelector('.tgi input').focus();}});
+    box.addEventListener('input',e=>{if(/[,،\/]/.test(e.target.value)){commit();draw();box.querySelector('.tgi input').focus();}});
+    box.addEventListener('focusout',e=>{if(e.target.tagName==='INPUT'&&e.target.value.trim()){commit();draw();}});
+    box.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+      if(b.dataset.rm!=null){tags[key].splice(+b.dataset.rm,1);draw();}
+      else if(b.dataset.add){commit();draw();box.querySelector('.tgi input').focus();}
+      else if(b.dataset.pre!=null){const x=b.dataset.pre,i=tags[key].indexOf(x);if(i>=0)tags[key].splice(i,1);else add(x);draw();}});
+    draw();
+  }
+  tagEd('sizes',['S','M','L','XL','XXL','Free']);tagEd('colors',null);
+  const tagVals=k=>{const b=$('#tg-'+k,body);if(b&&b._commit)b._commit();return tags[k].slice();};
   const T=$('#pf-imgs',body);
   function thumbs(){
     urls.forEach(u=>URL.revokeObjectURL(u));urls=files.map(f=>URL.createObjectURL(f));
@@ -801,7 +829,7 @@ function productSheet(p){
         if(r.error)throw r.error;
         uploaded.push(path);paths.push(path);
       }
-      const row={name,price,commission:comm,stock,sizes:listOf($('#pf-sizes').value),colors:listOf($('#pf-colors').value),details:$('#pf-det').value.trim(),images:paths,active:$('#pf-act').checked,...(catsOn()?{category:$('#pf-cat').value}:{}),updated_at:new Date().toISOString()};
+      const row={name,price,commission:comm,stock,sizes:tagVals('sizes'),colors:tagVals('colors'),details:$('#pf-det').value.trim(),images:paths,active:$('#pf-act').checked,...(catsOn()?{category:$('#pf-cat').value}:{}),updated_at:new Date().toISOString()};
       const r=edit?await sb.from('products').update(row).eq('id',p.id):await sb.from('products').insert(row);
       if(r.error)throw r.error;
       if(removed.length){try{await sb.storage.from(BUCKET).remove(removed);}catch(x){}}
