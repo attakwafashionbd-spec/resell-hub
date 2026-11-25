@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@500;700&family=Hind+Siliguri:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap">
 <style>
 /* Layout: sticky name bar with tabs, then a feed of product cards (1 column on phones, grid on wide screens).
    Commission always sits in its own amber cell so it never blends with price. */
@@ -23,7 +23,7 @@
   --ok:#1B7F3B;--ok-bg:#DFF3E5;--warn:#8A5A00;--warn-bg:#FFF0CF;--bad:#B3261E;--bad-bg:#FBE3E1;--info:#2B5FA8;--info-bg:#E1ECFA;
   --bar:rgba(243,246,245,.88);--g1:#CDEBE2;--g2:#FBE8C6;
   --pat:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='84' height='84' viewBox='0 0 84 84'%3E%3Cg fill='none' stroke='%230E6F5C' stroke-opacity='.10' stroke-width='1.5' stroke-linecap='round'%3E%3Cpath d='M42 8l6 6-6 6-6-6z'/%3E%3Cpath d='M0 42h10M74 42h10M42 64v12M36 70h12'/%3E%3Ccircle cx='0' cy='0' r='4'/%3E%3Ccircle cx='84' cy='0' r='4'/%3E%3Ccircle cx='0' cy='84' r='4'/%3E%3Ccircle cx='84' cy='84' r='4'/%3E%3C/g%3E%3C/svg%3E");
-  --f-display:'Anek Bangla','Hind Siliguri','Noto Sans Bengali',system-ui,sans-serif;
+  --f-display:'Hind Siliguri','Noto Sans Bengali',system-ui,sans-serif;
   --f-body:'Hind Siliguri','Noto Sans Bengali',system-ui,sans-serif;
 }
 @media (prefers-color-scheme: dark){:root{
@@ -37,7 +37,7 @@
 
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;font-family:var(--f-body);font-size:16px;line-height:1.55;background:var(--bg);color:var(--fg);min-height:100vh;
+body{margin:0;font-family:var(--f-body);font-weight:500;font-size:16px;line-height:1.55;background:var(--bg);color:var(--fg);min-height:100vh;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
   padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(48px + env(safe-area-inset-bottom,0px))}
 img{max-width:100%}
@@ -113,7 +113,7 @@ label{display:block;font-size:14px;font-weight:600;margin:12px 0 4px}
 .ph{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
 .ph h3{font-size:18px;line-height:1.35;font-weight:700}
 .prices{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.price{font:700 22px var(--f-display)}
+.price{font:700 24px var(--f-display)}
 .det{margin:0;white-space:pre-line;font-size:15px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
 .det.open{display:block;-webkit-line-clamp:unset}
 .acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -125,7 +125,7 @@ label{display:block;font-size:14px;font-weight:600;margin:12px 0 4px}
 @media(min-width:640px){.stats{grid-template-columns:repeat(4,1fr)}}
 .stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
 .stat span{display:block;font-size:13px;color:var(--muted)}
-.stat b{font:700 21px var(--f-display);font-variant-numeric:tabular-nums}
+.stat b{font:700 24px var(--f-display);font-variant-numeric:tabular-nums}
 .stat.hl{background:var(--comm-bg);border-color:transparent}
 .stat.hl span,.stat.hl b{color:var(--comm)}
 .chips{display:flex;gap:6px;overflow-x:auto;padding-block:2px}
@@ -210,9 +210,9 @@ label{display:block;font-size:14px;font-weight:600;margin:12px 0 4px}
 .timg{position:relative;display:block;aspect-ratio:1/1;background:var(--line)}
 .timg img{width:100%;height:100%;object-fit:cover;display:block}
 .tn{padding:6px 8px 0;font-size:12.5px;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.6em;overflow-wrap:anywhere}
-.tp{padding:0 8px;font:700 14px var(--f-display)}
+.tp{padding:0 8px;font:700 17px var(--f-display)}
 .tc{margin:2px 8px 0;font-size:11px;font-weight:700;color:var(--comm);background:var(--comm-bg);border-radius:99px;padding:1px 7px;justify-self:start;max-width:calc(100% - 16px);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-.tcnt{position:absolute;right:4px;bottom:4px;background:rgba(0,0,0,.6);color:#fff;font-size:10px;padding:0 6px;border-radius:99px}
+.tcnt{position:absolute;right:4px;bottom:4px;background:rgba(0,0,0,.7);color:#fff;font-size:13px;font-weight:700;padding:1px 8px;border-radius:99px}
 .tout{position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,.65);color:#fff;font-size:11px;text-align:center;padding:2px}
 .tile.off{opacity:.6}
 .chead{width:100%;display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:10px 14px;font:inherit;color:var(--fg);cursor:pointer;margin:14px 0 8px}
@@ -232,9 +232,22 @@ body{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
 .nv .badge{position:absolute;top:-4px;right:2px;font-size:11px;min-width:18px;line-height:18px;padding:0 5px}
 .hello{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;border-radius:16px;background:var(--surface);border:1px solid var(--line);margin-bottom:12px}
 .hl{min-width:0}.hl b{display:block;font:700 18px var(--f-display);line-height:1.3}.hd{font-size:13px;color:var(--muted)}
-.hc{text-align:right;font:700 21px var(--f-display);font-variant-numeric:tabular-nums;color:var(--accent);white-space:nowrap;line-height:1.2}
+.hc{text-align:right;font:700 24px var(--f-display);font-variant-numeric:tabular-nums;color:var(--accent);white-space:nowrap;line-height:1.2}
 .hc small{display:block;font-size:12px;color:var(--muted);font-weight:600}
 .vids{display:grid;gap:8px;padding:8px 12px 0}.vids video{width:100%;max-height:320px;border-radius:12px;background:#000}.vrow{display:flex;gap:8px;align-items:center;margin:4px 0}
+/* v11 */
+.notice{position:relative;background:#fff6d6;color:#4a3600;border:1px solid #e6c458;border-radius:16px;padding:12px 14px 12px 44px;margin-bottom:12px;box-shadow:0 2px 6px rgba(120,90,0,.15)}
+:root[data-theme=dark] .notice{background:#3a3010;color:#f3e3a6;border-color:#8a7020}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]) .notice{background:#3a3010;color:#f3e3a6;border-color:#8a7020}}
+.notice::before{content:'📌';position:absolute;left:12px;top:10px;font-size:22px}
+.notice b{display:block;font:700 17px var(--f-display);margin-bottom:2px}
+.notice p{margin:0;white-space:pre-line;font-size:15.5px;line-height:1.5}
+.notice small{display:block;margin-top:6px;opacity:.75;font-size:12.5px}
+.notice .btn{margin-top:8px}
+.order.unacc{background:color-mix(in srgb,#e11d48 9%,var(--surface));border-left:6px solid #e11d48}
+.unaccbar{appearance:none;width:100%;text-align:left;font:inherit;font-weight:700;color:#b4122f;background:color-mix(in srgb,#e11d48 12%,var(--surface));border:1px solid color-mix(in srgb,#e11d48 40%,transparent);border-radius:12px;padding:10px 14px;margin-bottom:10px;cursor:pointer}
+.dayh{grid-column:1/-1;position:sticky;top:calc(env(safe-area-inset-top,0px) + 60px);z-index:3;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;background:var(--accent);color:var(--accent-ink);border-radius:12px;padding:9px 14px;font-weight:700;cursor:pointer;appearance:none;border:0;font-family:inherit;font-size:15px;text-align:left;width:100%}
+.dayh small{font-weight:600;font-size:13px;opacity:.95}
 /* v10: রিসেলার তালিকা ও নোটিফিকেশন */
 .rl{display:grid;gap:8px;max-width:720px}
 .rrow{appearance:none;width:100%;text-align:left;font:inherit;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:12px;cursor:pointer}
@@ -248,14 +261,14 @@ body{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
 .nitem{appearance:none;width:100%;text-align:left;font:inherit;color:var(--fg);background:none;border:0;border-top:1px solid var(--line);padding:10px 4px;display:grid;gap:2px;cursor:pointer}
 .nitem.unread{background:color-mix(in srgb,var(--accent) 9%,transparent)}.nitem small{color:var(--muted)}
 /* v9: ক্যাটাগরি পাতা, ফেভারিট */
-.incat #hello,.incat #bnr,.incat #qs{display:none}
+.incat #notice,.incat #hello,.incat #bnr,.incat #qs{display:none}
 .cgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:14px}
 @media(min-width:760px){.cgrid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}}
 .ctl{appearance:none;border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:8px 8px 10px;display:grid;gap:6px;justify-items:center;cursor:pointer;color:var(--fg);font:inherit;position:relative;min-width:0}
 .cti{width:100%;aspect-ratio:1/1;border-radius:12px;overflow:hidden;background:var(--line);display:grid;place-items:center;font-size:38px}
 .cti img{width:100%;height:100%;object-fit:cover;display:block}
 .ctn{font-weight:700;font-size:14px;text-align:center;line-height:1.25;overflow-wrap:anywhere}
-.ctc{position:absolute;top:12px;right:12px;background:var(--accent);color:#fff;border-radius:99px;font-size:11px;font-weight:700;min-width:22px;padding:1px 7px;text-align:center}
+.ctc{position:absolute;top:12px;right:12px;background:var(--accent);color:#fff;border-radius:99px;font-size:14px;font-weight:700;min-width:26px;padding:1px 8px;text-align:center}
 .cbar{display:flex;align-items:center;gap:10px;margin:0 0 12px}.cbar b{font:700 18px var(--f-display);flex:1;min-width:0}
 .nstrip h3{margin:6px 0 8px;font-size:16px}.nrow{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none}.nrow::-webkit-scrollbar{display:none}.nrow .tile{flex:0 0 112px}
 .tfav,.tdl{position:absolute;right:6px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.92);color:#8a8a8a;display:grid;place-items:center;font-size:15px;line-height:1;box-shadow:0 1px 4px rgba(0,0,0,.25)}
@@ -311,6 +324,7 @@ body{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
     <main>
       <div id="note"></div>
       <section id="v-products">
+        <div id="notice"></div>
         <div id="hello" class="hello"></div>
         <div id="bnr" class="bnr" hidden></div>
         <div id="qs"></div>
@@ -331,7 +345,7 @@ body{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
       </section>
       <section id="v-settings" hidden></section>
     </main>
-<p class="ver">রিসেল হাব · সংস্করণ ১০</p>
+<p class="ver">রিসেল হাব · সংস্করণ ১১</p>
   </div>
   <nav id="bnav" class="bnav" aria-label="বিভাগ"></nav>
 </div>
@@ -347,12 +361,13 @@ const BUCKET='product-images';
 
 const $=(s,r)=>(r||document).querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const bn=n=>Number(n||0).toLocaleString('bn-BD');
-const tk=n=>'৳'+bn(n);
+const digEn=()=>{try{return localStorage.getItem('rh-dig')!=='bn';}catch(e){return true;}};
 const toEn=s=>String(s==null?'':s).replace(/[০-৯]/g,d=>'০১২৩৪৫৬৭৮৯'.indexOf(d));
+const bn=n=>digEn()?Number(n||0).toLocaleString('en-US'):Number(n||0).toLocaleString('bn-BD');
+const tk=n=>'৳'+bn(n);
 const num=v=>{const n=parseFloat(toEn(v).replace(/[^\d.]/g,''));return isFinite(n)?n:0;};
 const qn=v=>Math.max(1,Math.min(999,Math.round(num(v))||1));
-const fmtDate=ts=>{try{return new Date(ts).toLocaleString('bn-BD',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'});}catch(e){return '';}};
+const fmtDate=ts=>{try{const t=new Date(ts).toLocaleString('bn-BD',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'});return digEn()?toEn(t):t;}catch(e){return '';}};
 const shortId=id=>'#'+String(id).replace(/-/g,'').slice(-5).toUpperCase();
 const STATUS={new:'নতুন',accepted:'গৃহীত',delivered:'ডেলিভারি হয়েছে',cancelled:'বাতিল'};
 const WDLAB={pending:['অপেক্ষায়','st-new'],paid:['পরিশোধ হয়েছে','st-delivered'],rejected:['বাতিল','st-cancelled']};
@@ -541,6 +556,12 @@ function gotNotifs(list){
     if(fresh.length){const f=fresh[fresh.length-1];toast('🔔 '+f.title+(fresh.length>1?' (+'+bn(fresh.length-1)+'টি)':'')+' — '+f.body.slice(0,50));beep();}}
   S.notifs=list;
 }
+function renderNotice(){
+  const el=$('#notice');if(!el)return;
+  const st=S.settings||{};
+  if(!S.loaded||!st.notice_on||!(st.notice_text||'').trim()){el.innerHTML='';return;}
+  el.innerHTML='<div class="notice" role="note">'+(st.notice_title?'<b>'+esc(st.notice_title)+'</b>':'<b>নোটিশ</b>')+'<p>'+esc(st.notice_text)+'</p>'+(st.notice_at?'<small>নোটিশ দেওয়া হয়েছে: '+fmtDate(st.notice_at)+'</small>':'')+(S.isAdmin?'<button type="button" class="btn sm" data-act="noticeoff">নোটিশ সরান</button>':'')+'</div>';
+}
 const unreadN=()=>S.notifs.filter(n=>!n.read).length;
 function bellSheet(){
   const L=S.notifs;
@@ -711,7 +732,7 @@ function render(){
   $('#v-resellers').hidden=S.tab!=='resellers';
   $('#v-settings').hidden=S.tab!=='settings';
   $('#addp').hidden=!S.isAdmin;
-  if(S.tab==='products'){$('#v-products').classList.toggle('incat',catsOn()&&S.cat!=='home');renderHello();renderBanners();renderQs();renderCats();renderProducts();}
+  if(S.tab==='products'){$('#v-products').classList.toggle('incat',catsOn()&&S.cat!=='home');renderNotice();renderHello();renderBanners();renderQs();renderCats();renderProducts();}
   if(S.tab==='wallet')renderWallet();
   if(S.tab==='orders')renderOrders();
   if(S.tab==='resellers')renderResellers();
@@ -896,7 +917,7 @@ function linesTable(o,showHint){
 }
 function orderCard(o,admin){
   const st=statusOf(o),c=o.customer||{};
-  let h='<article class="card order" data-oid="'+esc(o.id)+'"><div class="oh"><span><b>'+shortId(o.id)+'</b> <span class="small">'+fmtDate(o.createdAt)+'</span></span><span class="chip st-'+st+'">'+STATUS[st]+'</span></div>';
+  let h='<article class="card order'+(admin&&st==='new'?' unacc':'')+'" data-oid="'+esc(o.id)+'"><div class="oh"><span><b>'+shortId(o.id)+'</b> <span class="small">'+fmtDate(o.createdAt)+'</span></span><span class="chip st-'+st+'">'+STATUS[st]+'</span></div>';
   if(admin){const r=S.profiles.find(p=>p.id===o.owner);h+='<div class="small">রিসেলার: '+esc(resellerName(o.owner))+(r&&r.phone?' · '+esc(r.phone):'')+'</div>';}
   h+='<div class="cust"><b>'+esc(c.name)+'</b><span>'+esc(c.phone)+'</span>'+(admin?'<span>'+esc(c.address)+'</span>':'')+(o.note?'<span class="small">নোট: '+esc(o.note)+'</span>':'')+'</div>';
   h+=linesTable(o,!admin);
@@ -920,6 +941,27 @@ function wdBlock(){
     '<div><button class="btn pri sm" data-act="wdnew"'+(avail>0?'':' disabled')+'>কমিশন তুলতে চাই</button>'+(min?' <span class="small">ন্যূনতম '+tk(min)+'</span>':'')+'</div>'+
     (reqs.length?'<div style="display:grid;gap:6px">'+reqs.slice(0,6).map(r=>'<div class="oh"><span>'+tk(r.amount)+' <span class="small">· '+fmtDate(r.at)+'</span></span><span class="chip '+WDLAB[r.status][1]+'">'+WDLAB[r.status][0]+'</span></div>').join('')+'</div>':'')+'</div>';
 }
+function dayKey(ts){const d=new Date(ts);return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
+function dayLabel(ts){
+  const d=new Date(ts),k=dayKey(ts),n=new Date(),y=new Date(n.getFullYear(),n.getMonth(),n.getDate()-1);
+  const full=BDAY[d.getDay()]+', '+toBd(d.getDate())+' '+BMON[d.getMonth()]+' '+toBd(d.getFullYear());
+  return k===dayKey(n.getTime())?'আজ · '+full:k===dayKey(y.getTime())?'গতকাল · '+full:full;
+}
+function dayGroups(list,all,admin){
+  const sum={};all.forEach(o=>{const k=dayKey(o.createdAt),x=sum[k]||(sum[k]={n:0,new:0,accepted:0,delivered:0,cancelled:0});x.n++;x[statusOf(o)]++;});
+  S.dayc=S.dayc||{};let out='',last='';
+  list=list.slice().sort((a,b)=>b.createdAt-a.createdAt);
+  list.forEach(o=>{
+    const k=dayKey(o.createdAt);
+    if(k!==last){
+      last=k;const x=sum[k];
+      const parts=[x.new?'নতুন '+bn(x.new):'',x.accepted?'পাঠানো বাকি '+bn(x.accepted):'',x.delivered?'ডেলিভারি '+bn(x.delivered):'',x.cancelled?'বাতিল '+bn(x.cancelled):''].filter(Boolean);
+      out+='<button type="button" class="dayh" data-act="dayt" data-k="'+esc(k)+'" aria-expanded="'+(!S.dayc[k])+'"><span>'+(S.dayc[k]?'▸ ':'▾ ')+esc(dayLabel(o.createdAt))+' — '+bn(x.n)+'টি অর্ডার</span><small>'+parts.join(' · ')+'</small></button>';
+    }
+    if(!S.dayc[k])out+=orderCard(o,admin);
+  });
+  return out;
+}
 function renderOrders(){
   const sum=$('#sum'),fl=$('#ofilter'),L=$('#olist');
   if(!S.loaded){sum.innerHTML='';fl.innerHTML='';L.innerHTML=loadHtml();return;}
@@ -930,12 +972,13 @@ function renderOrders(){
     sum.innerHTML='<div class="stats"><div class="stat"><span>নতুন অর্ডার</span><b>'+bn(cnt.new)+'</b></div><div class="stat"><span>গৃহীত</span><b>'+bn(cnt.accepted)+'</b></div><div class="stat"><span>ডেলিভারি হয়েছে</span><b>'+bn(cnt.delivered)+'</b></div><div class="stat hl"><span>মোট কমিশন বাকি</span><b>'+tk(due)+'</b></div></div>';
     fl.innerHTML=[['all','সব'],['new','নতুন'],['accepted','গৃহীত'],['delivered','ডেলিভারি হয়েছে'],['cancelled','বাতিল']].map(f=>'<button class="fchip" data-act="filter" data-f="'+f[0]+'" aria-pressed="'+(S.filter===f[0])+'">'+f[1]+' ('+bn(cnt[f[0]])+')</button>').join('');
     const list=all.filter(o=>S.filter==='all'||statusOf(o)===S.filter);
-    L.innerHTML=list.length?list.map(o=>orderCard(o,true)).join(''):'<div class="empty" style="grid-column:1/-1"><b>কোনো অর্ডার নেই</b>রিসেলাররা অর্ডার কনফার্ম করলে এখানে আসবে।</div>';
+    sum.innerHTML+=(cnt.new>0&&S.filter!=='new'?'<button type="button" class="unaccbar" data-act="filter" data-f="new">⚠ '+bn(cnt.new)+'টি অর্ডার গ্রহণ করা বাকি — চাপুন</button>':'');
+    L.innerHTML=list.length?dayGroups(list,all,true):'<div class="empty" style="grid-column:1/-1"><b>কোনো অর্ডার নেই</b>রিসেলাররা অর্ডার কনফার্ম করলে এখানে আসবে।</div>';
   }else{
     const os=myOrders(),s=statsFor(os,S.payouts),lp=S.payouts.slice().sort((a,b)=>b.at-a.at)[0];
     sum.innerHTML='<p class="small" style="margin:0">মোট অর্ডার '+bn(os.length)+'টি · ডেলিভারি হয়েছে '+bn(os.filter(o=>statusOf(o)==="delivered").length)+'টি</p>';
     fl.innerHTML='';
-    L.innerHTML=os.length?os.map(o=>orderCard(o,false)).join(''):'<div class="empty" style="grid-column:1/-1"><b>এখনও কোনো অর্ডার নেই</b>“পণ্য” ট্যাবে কোনো পণ্যের নিচে “অর্ডার করুন” চেপে প্রথম অর্ডার কনফার্ম করুন।</div>';
+    L.innerHTML=os.length?dayGroups(os,os,false):'<div class="empty" style="grid-column:1/-1"><b>এখনও কোনো অর্ডার নেই</b>“পণ্য” ট্যাবে কোনো পণ্যের নিচে “অর্ডার করুন” চেপে প্রথম অর্ডার কনফার্ম করুন।</div>';
   }
 }
 function resRows(){
@@ -989,7 +1032,13 @@ function renderSettings(){
   if(box.dataset.built==='1')return;
   box.dataset.built='1';
   const s=S.settings||{},v=x=>esc(x==null?'':x);
-  box.innerHTML='<form id="sf" class="card rc" style="max-width:560px" novalidate><h3>ডেলিভারি চার্জ</h3>'+
+  box.innerHTML=('notice_on' in s?'<form id="nf" class="card rc" style="max-width:560px" novalidate><h3>📌 নোটিশ বোর্ড</h3><p class="small" style="margin:0">চালু করলে সব রিসেলারের প্রথম পাতার উপরে দেখা যাবে। বন্ধ করলে সরে যাবে, লেখা সংরক্ষিত থাকবে।</p>'+
+    '<div><label for="nf-t" style="margin-top:0">শিরোনাম <span class="small">(ঐচ্ছিক)</span></label><input id="nf-t" maxlength="80" placeholder="যেমন: জরুরি জানানো হচ্ছে" value="'+v(s.notice_title)+'"></div>'+
+    '<div><label for="nf-x">নোটিশের লেখা</label><textarea id="nf-x" rows="4" maxlength="600" placeholder="যেমন: কাল শুক্রবার ডেলিভারি বন্ধ থাকবে।">'+v(s.notice_text)+'</textarea></div>'+
+    '<label class="chk" for="nf-on"><input id="nf-on" type="checkbox"'+(s.notice_on?' checked':'')+'> রিসেলারদের সামনে দেখান (চালু)</label>'+
+    '<div class="fbtns"><button class="btn pri" type="submit" id="nf-save">নোটিশ সংরক্ষণ</button></div></form>':'')+
+    '<div class="card rc" style="max-width:560px"><h3>সংখ্যা দেখানোর ধরন</h3><p class="small" style="margin:0">এখন: <b>'+(digEn()?'English (123)':'বাংলা (১২৩)')+'</b> — এই ফোন/কম্পিউটারের জন্য।</p><div><button type="button" class="btn sm" data-act="digtog">'+(digEn()?'বাংলা অঙ্কে দেখান':'English অঙ্কে দেখান')+'</button></div></div>'+
+    '<form id="sf" class="card rc" style="max-width:560px" novalidate><h3>ডেলিভারি চার্জ</h3>'+
     '<div class="row2"><div><label for="sf-in" style="margin-top:0">ঢাকার ভেতরে (৳)</label><input id="sf-in" inputmode="numeric" placeholder="যেমন ৬০" value="'+v(s.fee_in)+'"></div>'+
     '<div><label for="sf-out" style="margin-top:0">ঢাকার বাইরে (৳)</label><input id="sf-out" inputmode="numeric" placeholder="যেমন ১২০" value="'+v(s.fee_out)+'"></div></div>'+
     (catsOn()?'<h3 style="margin-top:8px">ক্যাটাগরি</h3><div><label for="sf-cats" style="margin-top:0">পণ্যের ক্যাটাগরি (কমা দিয়ে লিখুন)</label><input id="sf-cats" placeholder="বোরকা, টি-শার্ট, শাড়ি, পাঞ্জাবি" value="'+v((s.categories||[]).join(', '))+'"><p class="small" style="margin:6px 0 0">নাম বদলালে আগের পণ্য “অন্যান্য”-তে চলে যাবে, তাই পণ্যে ক্যাটাগরি আবার বেছে নিতে হবে।</p></div>':'<div class="note">ক্যাটাগরি চালু করতে Supabase-এ <b>update-1-categories.sql</b> একবার চালান।</div>')+
@@ -1220,6 +1269,9 @@ document.addEventListener('click',async e=>{
     case 'cat':{const was=S.cat;S.cat=t.dataset.c;S.lim=30;S.q='';const qi=$('#q');if(qi)qi.value='';if(was==='home')pushNav('c');render();window.scrollTo({top:0,behavior:'smooth'});break;}
     case 'home':{if(history.state&&history.state.k==='c'){history.back();}else goHome();break;}
     case 'bell':bellSheet();break;
+    case 'noticeoff':{try{const r=await sb.from('settings').update({notice_on:false}).eq('id',1);if(r.error)throw r.error;await loadAll();render();toast('নোটিশ সরানো হয়েছে।');}catch(x){toast(errMsg(x));}break;}
+    case 'dayt':{const k=t.dataset.k;S.dayc=S.dayc||{};S.dayc[k]=!S.dayc[k];renderOrders();break;}
+    case 'digtog':{try{localStorage.setItem('rh-dig',digEn()?'bn':'en');}catch(x){}location.reload();break;}
     case 'nreadall':await markRead(null);bellSheet();render();break;
     case 'nitem':{const k=t.dataset.k,id=t.dataset.nid;closeSheet();await markRead(id);S.tab=k==='order'?'orders':'resellers';render();window.scrollTo({top:0});break;}
     case 'ropen':resSheet(t.dataset.rid);break;
@@ -1279,6 +1331,21 @@ document.addEventListener('input',e=>{
 });
 document.addEventListener('submit',async e=>{
   const f=e.target;
+  if(f&&f.id==='nf'){
+    e.preventDefault();
+    const btn=$('#nf-save');btn.disabled=true;
+    try{
+      const txt=$('#nf-x').value.trim(),on=$('#nf-on').checked;
+      if(on&&!txt){btn.disabled=false;return toast('চালু করতে নোটিশের লেখা দিন।');}
+      const old=S.settings||{},changed=txt!==(old.notice_text||'')||$('#nf-t').value.trim()!==(old.notice_title||'')||(on&&!old.notice_on);
+      const r=await sb.from('settings').update({notice_title:$('#nf-t').value.trim(),notice_text:txt,notice_on:on,...(changed?{notice_at:new Date().toISOString()}:{})}).eq('id',1);
+      if(r.error)throw r.error;
+      const b=$('#v-settings');b.dataset.built='';
+      await loadAll();render();toast(on?'নোটিশ চালু হয়েছে।':'নোটিশ বন্ধ আছে, লেখা সংরক্ষিত।');
+    }catch(x){toast(errMsg(x));}
+    btn.disabled=false;
+    return;
+  }
   if(f&&f.id==='sf'){
     e.preventDefault();
     const btn=$('#sf-save');btn.disabled=true;
@@ -1294,6 +1361,22 @@ document.addEventListener('scroll',e=>{const g=e.target;if(!g||!g.classList||!g.
   const c=g.parentNode.querySelector('.cnt');if(c)c.textContent=bn(Math.round(g.scrollLeft/g.clientWidth)+1)+'/'+bn(g.children.length);},true);
 document.addEventListener('error',e=>{if(e.target&&e.target.tagName==='IMG')e.target.classList.add('broken');},true);
 
+/* ---------- সংখ্যা ইংরেজি অঙ্কে ---------- */
+(function(){
+  const DG=/[০-৯]/,skip=n=>{const p=n.parentNode;return !p||p.nodeName==='TEXTAREA'||p.nodeName==='SCRIPT'||p.nodeName==='STYLE';};
+  function fix(root){
+    const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT),a=[];
+    while(w.nextNode()){const n=w.currentNode;if(DG.test(n.nodeValue)&&!skip(n))a.push(n);}
+    a.forEach(n=>{n.nodeValue=toEn(n.nodeValue);});
+  }
+  if(!digEn())return;
+  fix(document.body);
+  new MutationObserver(ms=>{ms.forEach(m=>{
+    if(m.type==='characterData'){const n=m.target;if(DG.test(n.nodeValue)&&!skip(n))n.nodeValue=toEn(n.nodeValue);}
+    else m.addedNodes.forEach(n=>{if(n.nodeType===1)fix(n);else if(n.nodeType===3&&DG.test(n.nodeValue)&&!skip(n))n.nodeValue=toEn(n.nodeValue);});
+  });}).observe(document.body,{childList:true,subtree:true,characterData:true});
+})();
+
 /* ---------- লোডিং বার্তা ---------- */
 let sndEl=null,sndDone=false;
 function playLoadSnd(){if(sndDone||S.loaded)return;try{sndEl=sndEl||new Audio('loading.mp3');sndEl.volume=.8;const pr=sndEl.play();if(pr&&pr.then)pr.then(()=>{sndDone=true;}).catch(()=>{});}catch(e){}}
@@ -1301,7 +1384,7 @@ document.addEventListener('pointerdown',playLoadSnd,{once:true,capture:true});
 const loadHtml=()=>playLoadSnd()||'<div class="loadmsg"><span class="spin" aria-hidden="true"></span><p>বিশ্বাস করুন, রিজিকের মালিক আল্লাহ।</p></div>';
 
 /* ---------- শুভেচ্ছা, তারিখ ও ঘড়ি ---------- */
-const toBd=v=>String(v).replace(/\d/g,d=>'০১২৩৪৫৬৭৮৯'[d]);
+const toBd=v=>digEn()?String(v):String(v).replace(/\d/g,d=>'০১২৩৪৫৬৭৮৯'[d]);
 const BDAY=['রবিবার','সোমবার','মঙ্গলবার','বুধবার','বৃহস্পতিবার','শুক্রবার','শনিবার'];
 const BMON=['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
 function dayPart(h){return h<4?'রাত':h<6?'ভোর':h<12?'সকাল':h<15?'দুপুর':h<17?'বিকাল':h<19?'সন্ধ্যা':'রাত';}
